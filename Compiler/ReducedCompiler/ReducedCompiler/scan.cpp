@@ -5,6 +5,7 @@
 #define ALPHABET "ABCDEFGHIJKLMNOPQRSTUVWXYZ\
 			abcdefghijklmnopqrstuvwxyz"
 #define NUMDIGIT "0123456789"
+#define OTHERCHAR " \t\n`~!@#$%^&*()-_=+[]{};:'\""
 
 using namespace std;
 
@@ -83,6 +84,50 @@ private:
 		}
 	}
 
+	void buildInit() {
+		mapState("init", "ID", ALPHABET);
+		mapState("init", "NUM", NUMDIGIT);
+		mapState("init", "ADD", "+");
+		mapState("init", "SUB", "-");
+		mapState("init", "MUL", "*");
+		mapState("init", "DIV", "/");
+		mapState("init", "LT", "<");
+		mapState("init", "GT", ">");
+		mapState("init", "EQ", "=");
+		mapState("init", "NEQ", "!");
+		mapState("init", "ENDS", ";");
+		mapState("init", "COMMA", ",");
+		mapState("init", "LP", "(");
+		mapState("init", "RP", ")");
+		mapState("init", "LSB", "[");
+		mapState("init", "RSB", "]");
+		mapState("init", "LCB", "{");
+		mapState("init", "RCB", "}");
+	}
+	void buildID() {
+		mapState("ID", "ID", ALPHABET);
+
+		addState("yesID", false);
+		
+	}
+	void buildNUM() {}
+	void buildADD() {}
+	void buildSUB() {}
+	void buildMUL() {}
+	void buildDIV() {}
+	void buildLT() {}
+	void buildGT() {}
+	void buildEQ() {}
+	void buildNEQ() {}
+	void buildENDS() {}
+	void buildCOMMA() {}
+	void buildLP() {}
+	void buildRP() {}
+	void buildLSB() {}
+	void buildRSB() {}
+	void buildLCB() {}
+	void buildRCB() {}
+
 public:
 	Scanner(ifstream* f) : fin(f), current(nullptr) {
 		// Construct Automata
@@ -105,32 +150,26 @@ public:
 		addState("RSB", false);
 		addState("LCB", false);
 		addState("RCB", false);
-		addState("yestoken", true);
-		addState("notoken", true);
+		addState("yesToken", true);
+		addState("noToken", true);
 
-		/// init ///
-		mapState("init", "ID", ALPHABET);
-		mapState("init", "NUM", NUMDIGIT);
-		mapState("init", "ADD", "+");
-		mapState("init", "SUB", "-");
-		mapState("init", "MUL", "*");
-		mapState("init", "DIV", "/");
-		mapState("init", "LT", "<");
-		mapState("init", "GT", ">");
-		mapState("init", "EQ", "=");
-		mapState("init", "NEQ", "!");
-		mapState("init", "ENDS", ";");
-		mapState("init", "COMMA", ",");
-		mapState("init", "LP", "(");
-		mapState("init", "RP", ")");
-		mapState("init", "LSB", "[");
-		mapState("init", "RSB", "]");
-		mapState("init", "LCB", "{");
-		mapState("init", "RCB", "}");
-
-		/// ID ///
-		addState("ID_fin", false);
-
-		
+		buildInit();
+		buildNUM();
+		buildADD();
+		buildSUB();
+		buildMUL();
+		buildDIV();
+		buildLT();
+		buildGT();
+		buildEQ();
+		buildNEQ();
+		buildENDS();
+		buildCOMMA();
+		buildLP();
+		buildRP();
+		buildLSB();
+		buildRSB();
+		buildLCB();
+		buildRCB();
 	}	
 };
