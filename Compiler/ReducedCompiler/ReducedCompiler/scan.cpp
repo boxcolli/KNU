@@ -59,6 +59,10 @@ public:
 	}
 };
 
+class MultiState {
+	
+};
+
 class Scanner {
 private:
 	ifstream* fin;
@@ -67,29 +71,42 @@ private:
 
 	SingleState* current;
 
+	void addState(string name, bool finalState) {
+		states[name] = SingleState(finalState);
+	}
+
+	void mapState(string from, string to, string ins) {
+		SingleState s1 = states[from];
+		SingleState s2 = states[to];
+		for (char in : ins) {
+			s1.addMap(in, s2);
+		}
+	}
+
 public:
 	Scanner(ifstream* f) : fin(f), current(nullptr) {
 		// Construct Automata
-		addState("init", SingleState(false));
-		addState("ID", SingleState(false));
-		addState("NUM", SingleState(false));
-		addState("ADD", SingleState(false));
-		addState("SUB", SingleState(false));
-		addState("MUL", SingleState(false));
-		addState("DIV", SingleState(false));
-		addState("LT", SingleState(false));	// w/ LTE
-		addState("GT", SingleState(false));	// w/ GTE
-		addState("EQ", SingleState(false)); // w/ ASSIGN
-		addState("NEQ", SingleState(false));
-		addState("ENDS", SingleState(false));
-		addState("COMMA", SingleState(false));
-		addState("LP", SingleState(false));
-		addState("RP", SingleState(false));
-		addState("LSB", SingleState(false));
-		addState("RSB", SingleState(false));
-		addState("LCB", SingleState(false));
-		addState("RCB", SingleState(false));
-		addState("COMMENT", SingleState(false));
+		addState("init", false);
+		addState("ID", false);
+		addState("NUM", false);
+		addState("ADD", false);
+		addState("SUB", false);
+		addState("MUL", false);
+		addState("DIV", false);// w/ COMMENT
+		addState("LT", false);	// w/ LTE
+		addState("GT", false);	// w/ GTE
+		addState("EQ", false); // w/ ASSIGN
+		addState("NEQ", false);
+		addState("ENDS", false);
+		addState("COMMA", false);
+		addState("LP", false);
+		addState("RP", false);
+		addState("LSB", false);
+		addState("RSB", false);
+		addState("LCB", false);
+		addState("RCB", false);
+		addState("yestoken", true);
+		addState("notoken", true);
 
 		/// init ///
 		mapState("init", "ID", ALPHABET);
@@ -110,23 +127,10 @@ public:
 		mapState("init", "RSB", "]");
 		mapState("init", "LCB", "{");
 		mapState("init", "RCB", "}");
-		mapState("init", "COMMENT", "/");
 
 		/// ID ///
+		addState("ID_fin", false);
+
 		
-	}
-
-	void addState(string name, SingleState state) {
-		states[name] = state;
-	}
-
-	void mapState(string from, string to, string ins) {
-		SingleState s1 = states[from];
-		SingleState s2 = states[to];
-		for (char in : ins) {
-			s1.addMap(in, s2);
-		}		
-	}
-
-	
+	}	
 };
