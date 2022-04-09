@@ -2,39 +2,61 @@
 #include <map>
 #include <string>
 
-#define ALPHABET "ABCDEFGHIJKLMNOPQRSTUVWXYZ\
-			abcdefghijklmnopqrstuvwxyz"
-#define NUMDIGIT "0123456789"
-#define OTHERCHAR " \t\n`~!@#$%^&*()-_=+[]{};:'\""
-
 using namespace std;
 
+const string ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ\
+						abcdefghijklmnopqrstuvwxyz";
+const string NUMDIGIT = "0123456789";
+const string OTHERCHAR = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+const string WHITESPACE = " \t\n\v\f\r";
+
+/// <summary>
+/// Returns a copy of the base string after erasing some characters.
+/// </summary>
+string dropChars(const string base, string chars) {
+	string s = base;
+	for (auto it = s.begin(); it != s.end(); it++) {
+		for (char c : chars) {
+			if (*it == c) {
+				s.erase(it--);
+				break;
+			}
+		}
+	}
+	return s;
+}
+
+/// <summary>
+/// Basic form of state for any usage.
+/// </summary>
 class SingleState {
 private:
+
 	/// <summary>
-	/// Represents this state is non-final or final of which result.
+	/// Can hold any optional data. For example, non-final, final or else.
 	/// </summary>
 	int data;
 
 	/// <summary>
-	/// Map holding transition data
+	/// Holds transition data, with transition option
 	/// </summary>
-	map<char, SingleState> transition;
+	map<char, pair<SingleState*, int>> transition;
 
 public:
+
 	/// <summary>
 	/// Class SingleState constructor
 	/// </summary>
-	/// <param name="fin">Given true if this state is final, if else, false</param>
-	SingleState(int data) : data(data) {}
+	/// <param name="data">int value for optional data</param>
+	SingleState(int data=-1) : data(data) {}
 
 	/// <summary>
 	/// Add a transition from this state to another.
 	/// </summary>
 	/// <param name="in">A single input character</param>
 	/// <param name="next">Pointer to another state</param>
-	void addMap(char in, SingleState next) {
-		transition[in] = next;
+	void addMap(char in, SingleState* next, int opt) {
+		transition[in] = make_pair(next, opt);
 	}
 
 	/// <summary>
@@ -42,21 +64,21 @@ public:
 	/// </summary>
 	/// <param name="in">A single input character</param>
 	/// <returns>nullptr if not found or mapped. SingleState* if found.</returns>
-	SingleState* pushChar(char in) {
+	pair<SingleState*, int> pushChar(char in) {
 		auto search = transition.find(in);
 		if (search == transition.end()) {
-			return nullptr;
+			return make_pair(nullptr, -1);
 		}
 		else {
-			return &(search->second);
+			return search->second;
 		}
 	}
 
 	/// <summary>
 	/// </summary>
-	/// <returns>True if final state, if else, false</returns>
-	bool isFinal() {
-		return data != 0;
+	/// <returns> Assigned data for this state
+	bool getData() {
+		return data;
 	}
 };
 
@@ -70,32 +92,51 @@ private:
 	/// <summary>
 	/// 
 	/// </summary>
-	map<string, SingleState> states;
+	map<string, SingleState*> states;
 
+	/// <summary>
+	/// 
+	/// </summary>
 	SingleState* current;
 
-	void addState(string name, int data) {
-		states[name] = SingleState(data);
+	/// <summary>
+	/// 
+	/// </summary>
+	enum StateData {
+		nonf = 0,
+		fID, fNUM,
+		fADD, fSUB, fMUL, fDIV,
+		fLT, fLTE, fGT, fGTE, fEQ, fNEQ,
+		fASSIGN, fENDS, fCOMMA,
+		fLP, fRP, fLSB, fRSB, fLCB, fRCB
+	};
+	enum TransitionOption {
+		optNORMAL, optLOOKAHEAD
+	};
+
+	void addState(string name, int data=nonf) {
+		states[name] = new SingleState(data);
 	}
 
-	void mapState(string from, string to, string ins) {
-		SingleState s1 = states[from];
-		SingleState s2 = states[to];
-		for (char in : ins) {
-			s1.addMap(in, s2);
+	void mapState(string from, string to, string instring, int opt=optNORMAL) {
+		SingleState* s1 = states[from];
+		SingleState* s2 = states[to];
+		for (char in : instring) {
+			s1->addMap(in, s2, opt);
 		}
 	}
 
 	void buildInit() {
+		mapState("init", "init", WHITESPACE);
 		mapState("init", "ID", ALPHABET);
 		mapState("init", "NUM", NUMDIGIT);
 		mapState("init", "ADD", "+");
 		mapState("init", "SUB", "-");
 		mapState("init", "MUL", "*");
-		mapState("init", "DIV", "/");
-		mapState("init", "LT", "<");
-		mapState("init", "GT", ">");
-		mapState("init", "EQ", "=");
+		mapState("init", "DIV_COMMENT", "/");
+		mapState("init", "LT_LTE", "<");
+		mapState("init", "GT_GTE", ">");
+		mapState("init", "EQ_ASSIGN", "=");
 		mapState("init", "NEQ", "!");
 		mapState("init", "ENDS", ";");
 		mapState("init", "COMMA", ",");
@@ -108,51 +149,106 @@ private:
 	}
 	void buildID() {
 		mapState("ID", "ID", ALPHABET);
-
-		addState("yesID", fID);
-		
+		addState("fID", fID);
+		mapState("ID", "fID",
+					NUMDIGIT+OTHERCHAR+WHITESPACE,
+					optLOOKAHEAD);
 	}
-	void buildNUM() {}
-	void buildADD() {}
-	void buildSUB() {}
-	void buildMUL() {}
-	void buildDIV() {}
-	void buildLT() {}
-	void buildGT() {}
-	void buildEQ() {}
-	void buildNEQ() {}
-	void buildENDS() {}
-	void buildCOMMA() {}
-	void buildLP() {}
-	void buildRP() {}
-	void buildLSB() {}
-	void buildRSB() {}
-	void buildLCB() {}
-	void buildRCB() {}
+	void buildNUM() {
+		mapState("NUM", "NUM", NUMDIGIT);
+		addState("fNUM", fNUM);
+		mapState("NUM", "fNUM",
+					ALPHABET+OTHERCHAR+WHITESPACE,
+					optLOOKAHEAD);
+	}
+	// processing: /, /**/
+	void buildDIV_COMMENT() {
+		addState("fDIV", fDIV);
+		mapState("DIV_COMMENT", "fDIV",
+					ALPHABET+NUMDIGIT+
+						dropChars(OTHERCHAR, "*")
+						+WHITESPACE,
+					optLOOKAHEAD);
+
+		addState("COMMENT");
+		mapState("DIV_COMMENT", "COMMENT", "*");
+		mapState("COMMENT", "COMMENT",
+					ALPHABET+NUMDIGIT+
+						dropChars(OTHERCHAR, "*")
+						+WHITESPACE);	// ignore comments
+
+		addState("COMMENTend");
+		mapState("COMMENT", "COMMENTend", "*");
+		mapState("COMMENTend", "init", "/");
+	}
+	// processing: <, <=
+	void buildLT_LTE() {
+		addState("fLT", fLT);
+		mapState("LT_LTE", "fLT",
+					ALPHABET+NUMDIGIT+
+						dropChars(OTHERCHAR, "=")
+						+WHITESPACE,
+					optLOOKAHEAD);
+		
+		addState("fLTE", fLTE);
+		mapState("LT_LTE", "fLTE", "=");
+	}
+	// processing: >, >=
+	void buildGT_GTE() {
+		addState("fGT", fGT);
+		mapState("GT_GTE", "fGT",
+					ALPHABET+NUMDIGIT+
+						dropChars(OTHERCHAR, "=")
+						+WHITESPACE,
+					optLOOKAHEAD);
+		
+		addState("fGTE", fGTE);
+		mapState("GT_GTE", "fGTE", "=");
+	}
+	// processing: ==, =
+	void buildEQ_ASSIGN() {
+		addState("fEQ", fEQ);
+		mapState("EQ_ASSIGN", "fEQ", "=");
+
+		addState("fASSIGN", fASSIGN);
+		mapState("EQ_ASSIGN", "fASSIGN",
+					ALPHABET+NUMDIGIT+
+						dropChars(OTHERCHAR, "=")
+						+WHITESPACE,
+					optLOOKAHEAD);
+	}
+	void buildNEQ() {
+		addState("fNEQ", fNEQ);
+		mapState("NEQ", "fNEQ", "=");
+	}
 
 public:
-	enum StateData {
-		nonf = 0,
-		fID, fNUM,
-		fADD, fSUB, fMUL, fDIV,
-		fLT, fLTE, fGT, fGTE, fEQ, fNEQ,
-		fASSIGN, fENDS, fCOMMA,
-		fLP, fRP, fLSB, fRSB, fLCB, fRCB
+	
+	/// <summary>
+	/// Represents whether current input had made an enter to a final state,
+	/// and if it is, represents which type of final state.
+	/// </summary>
+	enum TokenType {
+		tnull,
+		tELSE, tIF, tINT, tRETURN, tVOID, tWHILE,
+		tADD, tSUB, tMUL, tDIV, tLT, tLTE, tGT, tGTE, tEQ, tNEQ,
+		tASSIGN, tENDS, tCOMMA,
+		tLP, tRP, tLSB, tRSB, tLCB, tRCB
 	};
 
 	Scanner(ifstream* f) : fin(f), current(nullptr) {
 		// Construct Automata
-		addState("init", nonf);
-		addState("ID", nonf);
-		addState("NUM", nonf);
+		addState("init");
+		addState("ID");
+		addState("NUM");
 		addState("ADD", fADD);
 		addState("SUB", fSUB);
 		addState("MUL", fMUL);
-		addState("DIV", nonf);	// w/ COMMENT
-		addState("LT", nonf);	// w/ LTE
-		addState("GT", nonf);	// w/ GTE
-		addState("EQ", nonf);	// w/ ASSIGN
-		addState("NEQ", fNEQ);
+		addState("DIV_COMMENT");
+		addState("LT_LTE");
+		addState("GT_GTE");
+		addState("EQ_ASSIGN");
+		addState("NEQ");
 		addState("ENDS", fENDS);
 		addState("COMMA", fCOMMA);
 		addState("LP", fLP);
@@ -164,22 +260,11 @@ public:
 
 		buildInit();
 		buildNUM();
-		buildADD();
-		buildSUB();
-		buildMUL();
-		buildDIV();
-		buildLT();
-		buildGT();
-		buildEQ();
+		buildDIV_COMMENT();
+		buildLT_LTE();
+		buildGT_GTE();
+		buildEQ_ASSIGN();
 		buildNEQ();
-		buildENDS();
-		buildCOMMA();
-		buildLP();
-		buildRP();
-		buildLSB();
-		buildRSB();
-		buildLCB();
-		buildRCB();
 	}
 };
 
