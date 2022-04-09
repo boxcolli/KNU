@@ -12,9 +12,9 @@ using namespace std;
 class SingleState {
 private:
 	/// <summary>
-	/// True if final state, if else, false.
+	/// Represents this state is non-final or final of which result.
 	/// </summary>
-	bool finalState;
+	int data;
 
 	/// <summary>
 	/// Map holding transition data
@@ -26,7 +26,7 @@ public:
 	/// Class SingleState constructor
 	/// </summary>
 	/// <param name="fin">Given true if this state is final, if else, false</param>
-	SingleState(bool f) : finalState(f) {}
+	SingleState(int data) : data(data) {}
 
 	/// <summary>
 	/// Add a transition from this state to another.
@@ -56,24 +56,26 @@ public:
 	/// </summary>
 	/// <returns>True if final state, if else, false</returns>
 	bool isFinal() {
-		return finalState;
+		return data != 0;
 	}
-};
-
-class MultiState {
-	
 };
 
 class Scanner {
 private:
+	/// <summary>
+	/// File stream pointer
+	/// </summary>
 	ifstream* fin;
 
+	/// <summary>
+	/// 
+	/// </summary>
 	map<string, SingleState> states;
 
 	SingleState* current;
 
-	void addState(string name, bool finalState) {
-		states[name] = SingleState(finalState);
+	void addState(string name, int data) {
+		states[name] = SingleState(data);
 	}
 
 	void mapState(string from, string to, string ins) {
@@ -107,7 +109,7 @@ private:
 	void buildID() {
 		mapState("ID", "ID", ALPHABET);
 
-		addState("yesID", false);
+		addState("yesID", fID);
 		
 	}
 	void buildNUM() {}
@@ -129,29 +131,36 @@ private:
 	void buildRCB() {}
 
 public:
+	enum StateData {
+		nonf = 0,
+		fID, fNUM,
+		fADD, fSUB, fMUL, fDIV,
+		fLT, fLTE, fGT, fGTE, fEQ, fNEQ,
+		fASSIGN, fENDS, fCOMMA,
+		fLP, fRP, fLSB, fRSB, fLCB, fRCB
+	};
+
 	Scanner(ifstream* f) : fin(f), current(nullptr) {
 		// Construct Automata
-		addState("init", false);
-		addState("ID", false);
-		addState("NUM", false);
-		addState("ADD", false);
-		addState("SUB", false);
-		addState("MUL", false);
-		addState("DIV", false);// w/ COMMENT
-		addState("LT", false);	// w/ LTE
-		addState("GT", false);	// w/ GTE
-		addState("EQ", false); // w/ ASSIGN
-		addState("NEQ", false);
-		addState("ENDS", false);
-		addState("COMMA", false);
-		addState("LP", false);
-		addState("RP", false);
-		addState("LSB", false);
-		addState("RSB", false);
-		addState("LCB", false);
-		addState("RCB", false);
-		addState("yesToken", true);
-		addState("noToken", true);
+		addState("init", nonf);
+		addState("ID", nonf);
+		addState("NUM", nonf);
+		addState("ADD", fADD);
+		addState("SUB", fSUB);
+		addState("MUL", fMUL);
+		addState("DIV", nonf);	// w/ COMMENT
+		addState("LT", nonf);	// w/ LTE
+		addState("GT", nonf);	// w/ GTE
+		addState("EQ", nonf);	// w/ ASSIGN
+		addState("NEQ", fNEQ);
+		addState("ENDS", fENDS);
+		addState("COMMA", fCOMMA);
+		addState("LP", fLP);
+		addState("RP", fRP);
+		addState("LSB", fLSB);
+		addState("RSB", fRSB);
+		addState("LCB", fLCB);
+		addState("RCB", fRCB);
 
 		buildInit();
 		buildNUM();
@@ -171,5 +180,6 @@ public:
 		buildRSB();
 		buildLCB();
 		buildRCB();
-	}	
+	}
 };
+
