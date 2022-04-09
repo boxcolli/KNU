@@ -84,24 +84,16 @@ public:
 
 class Scanner {
 private:
-	/// <summary>
-	/// File stream pointer
-	/// </summary>
 	ifstream* fin;
 
-	/// <summary>
-	/// 
-	/// </summary>
 	map<string, SingleState*> states;
 
-	/// <summary>
-	/// 
-	/// </summary>
 	SingleState* current;
 
-	/// <summary>
-	/// 
-	/// </summary>
+	string tokenbuffer;
+
+	
+
 	enum StateData {
 		nonf = 0,
 		fID, fNUM,
@@ -114,6 +106,8 @@ private:
 		optNORMAL, optLOOKAHEAD
 	};
 
+
+
 	void addState(string name, int data=nonf) {
 		states[name] = new SingleState(data);
 	}
@@ -124,6 +118,29 @@ private:
 		for (char in : instring) {
 			s1->addMap(in, s2, opt);
 		}
+	}
+
+	void buildState() {
+		// Construct Automata
+		addState("init");
+		addState("ID");
+		addState("NUM");
+		addState("ADD", fADD);
+		addState("SUB", fSUB);
+		addState("MUL", fMUL);
+		addState("DIV_COMMENT");
+		addState("LT_LTE");
+		addState("GT_GTE");
+		addState("EQ_ASSIGN");
+		addState("NEQ");
+		addState("ENDS", fENDS);
+		addState("COMMA", fCOMMA);
+		addState("LP", fLP);
+		addState("RP", fRP);
+		addState("LSB", fLSB);
+		addState("RSB", fRSB);
+		addState("LCB", fLCB);
+		addState("RCB", fRCB);
 	}
 
 	void buildInit() {
@@ -222,11 +239,16 @@ private:
 		mapState("NEQ", "fNEQ", "=");
 	}
 
+	void processChar() {
+		
+	}
+
 public:
-	
+
+
+
 	/// <summary>
-	/// Represents whether current input had made an enter to a final state,
-	/// and if it is, represents which type of final state.
+	/// 
 	/// </summary>
 	enum TokenType {
 		tnull,
@@ -237,27 +259,7 @@ public:
 	};
 
 	Scanner(ifstream* f) : fin(f), current(nullptr) {
-		// Construct Automata
-		addState("init");
-		addState("ID");
-		addState("NUM");
-		addState("ADD", fADD);
-		addState("SUB", fSUB);
-		addState("MUL", fMUL);
-		addState("DIV_COMMENT");
-		addState("LT_LTE");
-		addState("GT_GTE");
-		addState("EQ_ASSIGN");
-		addState("NEQ");
-		addState("ENDS", fENDS);
-		addState("COMMA", fCOMMA);
-		addState("LP", fLP);
-		addState("RP", fRP);
-		addState("LSB", fLSB);
-		addState("RSB", fRSB);
-		addState("LCB", fLCB);
-		addState("RCB", fRCB);
-
+		buildState();
 		buildInit();
 		buildNUM();
 		buildDIV_COMMENT();
