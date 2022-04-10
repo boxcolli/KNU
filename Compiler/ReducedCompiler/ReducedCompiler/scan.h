@@ -25,44 +25,32 @@ string dropChars(const string base, string chars) {
 	return s;
 }
 
-/// <summary>
 /// Basic form of state for any usage.
-/// </summary>
 class SingleState {
 private:
 
-	/// <summary>
 	/// Can hold any optional data. For example, non-final, final or else.
-	/// </summary>
 	int data;
 
-	/// <summary>
 	/// Holds transition data, with transition option
-	/// </summary>
 	map<char, pair<SingleState*, int>> transition;
 
 public:
 
-	/// <summary>
 	/// Class SingleState constructor
-	/// </summary>
-	/// <param name="data">int value for optional data</param>
+	/// data: int value for optional data
 	SingleState(int data = -1) : data(data) {}
 
-	/// <summary>
 	/// Add a transition from this state to another.
-	/// </summary>
-	/// <param name="in">A single input character</param>
-	/// <param name="next">Pointer to another state</param>
+	/// in: A single input character
+	/// next: Pointer to another state
 	void addMap(char in, SingleState* next, int opt) {
 		transition[in] = make_pair(next, opt);
 	}
 
-	/// <summary>
 	/// Push a single input character to make transition
-	/// </summary>
-	/// <param name="in">A single input character</param>
-	/// <returns>nullptr if not found or mapped. SingleState* if found.</returns>
+	/// in: A single input character</param>
+	/// returns nullptr if not found or mapped. SingleState* if found.
 	pair<SingleState*, int> pushChar(char in) {
 		auto search = transition.find(in);
 		if (search == transition.end()) {
@@ -73,17 +61,60 @@ public:
 		}
 	}
 
-	/// <summary>
-	/// </summary>
-	/// <returns> Assigned data for this state
-	bool getData() {
+	/// returns assigned data for this state.
+	int getData() {
 		return data;
+	}
+};
+
+class FileHeader {
+private:
+	ifstream* fin;
+	string buffer;
+	int length;
+	int cursor;
+
+	char putBackChar;
+	bool putBackFlag;
+
+public:
+	FileHeader(ifstream* fin) : fin(fin) {
+		getline(*fin, buffer);
+		length = buffer.length();
+		cursor = 0;
+	}
+
+	char getChar() {
+		// have pushed back char
+		if (putBackFlag) {
+			putBackFlag = false;
+			return putBackChar;
+		}
+		// buffer not empty
+		else if (cursor != length) {
+			return buffer[cursor++];
+		}
+		// buffer empty
+		else {
+			getline(*fin, buffer);
+			if (fin->eof()) {
+				return EOF;
+			}
+			length = buffer.length();
+			cursor = 0;
+			return '\n';
+		}
+	}
+
+	void putBack(char c) {
+		putBackChar = c;
+		putBackFlag = true;
 	}
 };
 
 class Scanner {
 private:
-	ifstream* fin;
+	FileHeader fileHeader;
 
 	map<string, SingleState*> states;
 
@@ -99,18 +130,22 @@ private:
 	// recent error
 	int errorType;
 
+	
+
 	typedef enum class StateData {
 		nonf = 0,
 		fID, fNUM,
 		fADD, fSUB, fMUL, fDIV,
 		fLT, fLTE, fGT, fGTE, fEQ, fNEQ,
 		fASSIGN, fENDS, fCOMMA,
-		fLP, fRP, fLSB, fRSB, fLCB, fRCB
+		fLP, fRP, fLSB, fRSB, fLCB, fRCB,
+		fCOMMENT
 	};
 
 	typedef enum class TransitionOption {
 		optNORMAL, optLOOKAHEAD, optDISCARD
 	};
+
 
 	void addState(string name, StateData data = StateData::nonf) {
 		states[name] = new SingleState(static_cast<int>(data));
@@ -171,8 +206,9 @@ private:
 	}
 	void buildID() {
 		mapState("ID", "ID", ALPHABET);
+
 		addState("fID", StateData::fID);
-		mapState("ID", "StateData::fID",
+		mapState("ID", "fID",
 			NUMDIGIT + OTHERCHAR + WHITESPACE,
 			TransitionOption::optLOOKAHEAD);
 	}
@@ -195,13 +231,19 @@ private:
 		addState("COMMENT");
 		mapState("DIV_COMMENT", "COMMENT", "*");
 		mapState("COMMENT", "COMMENT",
-			ALPHABET + NUMDIGIT +
-			dropChars(OTHERCHAR, "*")
-			+ WHITESPACE);	// ignore comments
+					ALPHABET + NUMDIGIT +
+					dropChars(OTHERCHAR, "*")
+					+ WHITESPACE);	// ignore comments
 
-		addState("COMMENTend");
-		mapState("COMMENT", "COMMENTend", "*");
-		mapState("COMMENTend", "init", "/");
+		addState("COMMENT2");
+		mapState("COMMENT", "COMMENT2", "*");
+		mapState("COMMENT2", "COMMENT",
+					ALPHABET + NUMDIGIT +
+					dropChars(OTHERCHAR, "*")
+					+ WHITESPACE);
+
+		addState("COMMENTend", StateData::fCOMMENT);
+		mapState("COMMENT2", "COMMENTend", "/");
 	}
 	// processing: <, <=
 	void buildLT_LTE() {
@@ -263,7 +305,8 @@ public:
 		tID, tNUM,
 		tADD, tSUB, tMUL, tDIV, tLT, tLTE, tGT, tGTE, tEQ, tNEQ,
 		tASSIGN, tENDS, tCOMMA,
-		tLP, tRP, tLSB, tRSB, tLCB, tRCB
+		tLP, tRP, tLSB, tRSB, tLCB, tRCB,
+		tCOMMENT
 	};
 
 	typedef enum ErrorType {
@@ -273,13 +316,14 @@ public:
 		eENDOFFILE
 	};
 
-	Scanner(ifstream* f) : fin(f),
-		tokenBuffer(""),
-		flushFlag(false),
-		errorType(eNOERROR) {
+	Scanner(ifstream* f) : fileHeader(FileHeader(f)),
+							tokenBuffer(""),
+							flushFlag(false),
+							errorType(eNOERROR) {
 		// build DFA
 		buildState();
 		buildInit();
+		buildID();
 		buildNUM();
 		buildDIV_COMMENT();
 		buildLT_LTE();
@@ -291,22 +335,22 @@ public:
 	}
 
 	TokenType processChar() {
-		char in;
+		char in = fileHeader.getChar();
 
 		// EOF?
-		if (!(*fin >> in)) {
+		if (in == EOF) {
 			errorType = eENDOFFILE;
 			return tERROR;
 		}
 
-		// flush?
+		// flush token?
 		if (flushFlag) {
 			tokenBuffer.clear();
 			flushFlag = false;
 		}
 
 		// retrieve result from current state
-		auto temp = currentState->pushChar(in);
+		pair<SingleState*, int> temp = currentState->pushChar(in);
 		SingleState* nextState = temp.first;
 		int opt = temp.second;
 
@@ -324,6 +368,8 @@ public:
 			// set error
 			errorType = eINVALIDINPUT;
 
+			cout << "StateData(" << currentState->getData() << ")\n";
+
 			return tERROR;
 		}
 
@@ -333,7 +379,7 @@ public:
 		// process transition option
 		switch (static_cast<TransitionOption>(opt)) {
 		case TransitionOption::optLOOKAHEAD:
-			fin->putback(in);
+			fileHeader.putBack(in);
 			break;
 		case TransitionOption::optDISCARD:
 			// discard
@@ -348,6 +394,7 @@ public:
 		// process state data
 		StateData stateData = static_cast<StateData>(nextState->getData());
 		if (stateData == StateData::nonf) {
+			currentState = nextState;
 			return tNULL;
 		}
 		else {
@@ -375,6 +422,7 @@ public:
 			case StateData::fRSB:		return tRSB;
 			case StateData::fLCB:		return tLCB;
 			case StateData::fRCB:		return tRCB;
+			case StateData::fCOMMENT:	return tCOMMENT;
 			default:
 				errorType = eNOMATCHINGTTYPE;
 				return tERROR;
