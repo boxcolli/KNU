@@ -133,6 +133,7 @@ typedef enum class TokErrType {
 	eNOERROR,
 	eNOMATCHINGTTYPE,
 	eINVALIDINPUT,
+	eNOCOMMENTEND,
 	eENDOFFILE
 };
 
@@ -326,37 +327,35 @@ private:
 
 	TokenType stateToToken(StateData stateData) {
 		switch (stateData) {
-			case StateData::fID:		return findKeyword(tokenBuffer);
-			case StateData::fNUM:		return TokenType::tNUM;
-			case StateData::fADD:		return TokenType::tADD;
-			case StateData::fSUB:		return TokenType::tSUB;
-			case StateData::fMUL:		return TokenType::tMUL;
-			case StateData::fDIV:		return TokenType::tDIV;
-			case StateData::fLT:		return TokenType::tLT;
-			case StateData::fLTE:		return TokenType::tLTE;
-			case StateData::fGT:		return TokenType::tGT;
-			case StateData::fGTE:		return TokenType::tGTE;
-			case StateData::fEQ:		return TokenType::tEQ;
-			case StateData::fNEQ:		return TokenType::tNEQ;
-			case StateData::fASSIGN:	return TokenType::tASSIGN;
-			case StateData::fENDS:		return TokenType::tENDS;
-			case StateData::fCOMMA:		return TokenType::tCOMMA;
-			case StateData::fLP:		return TokenType::tLP;
-			case StateData::fRP:		return TokenType::tRP;
-			case StateData::fLSB:		return TokenType::tLSB;
-			case StateData::fRSB:		return TokenType::tRSB;
-			case StateData::fLCB:		return TokenType::tLCB;
-			case StateData::fRCB:		return TokenType::tRCB;
-			case StateData::fCOMMENT:	return TokenType::tCOMMENT;
-			default:
-				errorType = TokErrType::eNOMATCHINGTTYPE;
-				return TokenType::tERROR;
-			}
+		case StateData::fID:		return findKeyword(tokenBuffer);
+		case StateData::fNUM:		return TokenType::tNUM;
+		case StateData::fADD:		return TokenType::tADD;
+		case StateData::fSUB:		return TokenType::tSUB;
+		case StateData::fMUL:		return TokenType::tMUL;
+		case StateData::fDIV:		return TokenType::tDIV;
+		case StateData::fLT:		return TokenType::tLT;
+		case StateData::fLTE:		return TokenType::tLTE;
+		case StateData::fGT:		return TokenType::tGT;
+		case StateData::fGTE:		return TokenType::tGTE;
+		case StateData::fEQ:		return TokenType::tEQ;
+		case StateData::fNEQ:		return TokenType::tNEQ;
+		case StateData::fASSIGN:	return TokenType::tASSIGN;
+		case StateData::fENDS:		return TokenType::tENDS;
+		case StateData::fCOMMA:		return TokenType::tCOMMA;
+		case StateData::fLP:		return TokenType::tLP;
+		case StateData::fRP:		return TokenType::tRP;
+		case StateData::fLSB:		return TokenType::tLSB;
+		case StateData::fRSB:		return TokenType::tRSB;
+		case StateData::fLCB:		return TokenType::tLCB;
+		case StateData::fRCB:		return TokenType::tRCB;
+		case StateData::fCOMMENT:	return TokenType::tCOMMENT;
+		default:
+			errorType = TokErrType::eNOMATCHINGTTYPE;
+			return TokenType::tERROR;
+		}
 	}
 
 public:
-
-	
 
 	Scanner(ifstream* f) : fileHeader(FileHeader(f)),
 							tokenBuffer(""),
@@ -381,7 +380,13 @@ public:
 
 		// EOF?
 		if (in == EOF) {
-			errorType = TokErrType::eENDOFFILE;
+			if (currentState == states["COMMENT"]
+				|| currentState == states["COMMENTS2"]) {
+				errorType = TokErrType::eNOCOMMENTEND;
+			}
+			else {
+				errorType = TokErrType::eENDOFFILE;
+			}			
 			return TokenType::tERROR;
 		}
 		
