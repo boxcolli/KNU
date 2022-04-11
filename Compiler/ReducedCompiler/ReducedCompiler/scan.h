@@ -9,9 +9,7 @@ const string NUMDIGIT = "0123456789";
 const string OTHERCHAR = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 const string WHITESPACE = " \t\n\v\f\r";
 
-/// <summary>
 /// Returns a copy of the base string after erasing some characters.
-/// </summary>
 string dropChars(const string base, string chars) {
 	string s = base;
 	for (auto it = s.begin(); it != s.end(); it++) {
@@ -112,6 +110,24 @@ public:
 	}
 };
 
+typedef enum TokenType {
+		tERROR = -1,
+		tNULL,
+		tELSE, tIF, tINT, tRETURN, tVOID, tWHILE,
+		tID, tNUM,
+		tADD, tSUB, tMUL, tDIV, tLT, tLTE, tGT, tGTE, tEQ, tNEQ,
+		tASSIGN, tENDS, tCOMMA,
+		tLP, tRP, tLSB, tRSB, tLCB, tRCB,
+		tCOMMENT
+	};
+
+typedef enum ErrorType {
+	eNOERROR,
+	eNOMATCHINGTTYPE,
+	eINVALIDINPUT,
+	eENDOFFILE
+};
+
 class Scanner {
 private:
 	FileHeader fileHeader;
@@ -130,7 +146,8 @@ private:
 	// recent error
 	int errorType;
 
-	
+	// recent newline
+	bool newline;
 
 	typedef enum class StateData {
 		nonf = 0,
@@ -296,25 +313,13 @@ private:
 		else return tID;
 	}
 
+	int stateTokenMatch(TokeNType t) {
+		
+	}
+
 public:
 
-	typedef enum TokenType {
-		tERROR = -1,
-		tNULL,
-		tELSE, tIF, tINT, tRETURN, tVOID, tWHILE,
-		tID, tNUM,
-		tADD, tSUB, tMUL, tDIV, tLT, tLTE, tGT, tGTE, tEQ, tNEQ,
-		tASSIGN, tENDS, tCOMMA,
-		tLP, tRP, tLSB, tRSB, tLCB, tRCB,
-		tCOMMENT
-	};
-
-	typedef enum ErrorType {
-		eNOERROR,
-		eNOMATCHINGTTYPE,
-		eINVALIDINPUT,
-		eENDOFFILE
-	};
+	
 
 	Scanner(ifstream* f) : fileHeader(FileHeader(f)),
 							tokenBuffer(""),
@@ -341,6 +346,14 @@ public:
 		if (in == EOF) {
 			errorType = eENDOFFILE;
 			return tERROR;
+		}
+		
+		// newline?
+		if (in == '\n') {
+			newline = true;
+		}
+		else {
+			newline = false;
 		}
 
 		// flush token?
