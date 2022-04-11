@@ -468,6 +468,10 @@ public:
 	TokErrType getErrorType() {
 		return errorType;
 	}
+
+	bool isNewLine() {
+		return newline;
+	}
 };
 
 
