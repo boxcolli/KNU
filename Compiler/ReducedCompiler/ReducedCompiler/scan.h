@@ -23,7 +23,9 @@ string dropChars(const string base, string chars) {
 	return s;
 }
 
-/// Basic form of state for any usage.
+/**************************************************
+Basic form of state
+**************************************************/
 class SingleState {
 private:
 
@@ -65,6 +67,9 @@ public:
 	}
 };
 
+/**************************************************
+File read helper	
+**************************************************/
 class FileHeader {
 private:
 	ifstream* fin;
@@ -110,7 +115,10 @@ public:
 	}
 };
 
-typedef enum TokenType {
+/**************************************************
+Scanner output	
+**************************************************/
+typedef enum class TokenType {
 		tERROR = -1,
 		tNULL,
 		tELSE, tIF, tINT, tRETURN, tVOID, tWHILE,
@@ -121,13 +129,16 @@ typedef enum TokenType {
 		tCOMMENT
 	};
 
-typedef enum ErrorType {
+typedef enum class TokErrType {
 	eNOERROR,
 	eNOMATCHINGTTYPE,
 	eINVALIDINPUT,
 	eENDOFFILE
 };
 
+/******************************
+*Scanner	
+******************************/
 class Scanner {
 private:
 	FileHeader fileHeader;
@@ -144,7 +155,7 @@ private:
 	bool flushFlag;
 
 	// recent error
-	int errorType;
+	TokErrType errorType;
 
 	// recent newline
 	bool newline;
@@ -303,18 +314,44 @@ private:
 		mapState("NEQ", "fNEQ", "=");
 	}
 
-	int findKeyword(string token) {
-		if (token == "else") return tELSE;
-		else if (token == "if") return tIF;
-		else if (token == "int") return tINT;
-		else if (token == "return") return tRETURN;
-		else if (token == "void") return tVOID;
-		else if (token == "while") return tWHILE;
-		else return tID;
+	TokenType findKeyword(string token) {
+		if (token == "else") return TokenType::tELSE;
+		else if (token == "if") return TokenType::tIF;
+		else if (token == "int") return TokenType::tINT;
+		else if (token == "return") return TokenType::tRETURN;
+		else if (token == "void") return TokenType::tVOID;
+		else if (token == "while") return TokenType::tWHILE;
+		else return TokenType::tID;
 	}
 
-	int stateTokenMatch(TokeNType t) {
-		
+	TokenType stateToToken(StateData stateData) {
+		switch (stateData) {
+			case StateData::fID:		return findKeyword(tokenBuffer);
+			case StateData::fNUM:		return TokenType::tNUM;
+			case StateData::fADD:		return TokenType::tADD;
+			case StateData::fSUB:		return TokenType::tSUB;
+			case StateData::fMUL:		return TokenType::tMUL;
+			case StateData::fDIV:		return TokenType::tDIV;
+			case StateData::fLT:		return TokenType::tLT;
+			case StateData::fLTE:		return TokenType::tLTE;
+			case StateData::fGT:		return TokenType::tGT;
+			case StateData::fGTE:		return TokenType::tGTE;
+			case StateData::fEQ:		return TokenType::tEQ;
+			case StateData::fNEQ:		return TokenType::tNEQ;
+			case StateData::fASSIGN:	return TokenType::tASSIGN;
+			case StateData::fENDS:		return TokenType::tENDS;
+			case StateData::fCOMMA:		return TokenType::tCOMMA;
+			case StateData::fLP:		return TokenType::tLP;
+			case StateData::fRP:		return TokenType::tRP;
+			case StateData::fLSB:		return TokenType::tLSB;
+			case StateData::fRSB:		return TokenType::tRSB;
+			case StateData::fLCB:		return TokenType::tLCB;
+			case StateData::fRCB:		return TokenType::tRCB;
+			case StateData::fCOMMENT:	return TokenType::tCOMMENT;
+			default:
+				errorType = TokErrType::eNOMATCHINGTTYPE;
+				return TokenType::tERROR;
+			}
 	}
 
 public:
@@ -324,7 +361,7 @@ public:
 	Scanner(ifstream* f) : fileHeader(FileHeader(f)),
 							tokenBuffer(""),
 							flushFlag(false),
-							errorType(eNOERROR) {
+							errorType(TokErrType::eNOERROR) {
 		// build DFA
 		buildState();
 		buildInit();
@@ -344,8 +381,8 @@ public:
 
 		// EOF?
 		if (in == EOF) {
-			errorType = eENDOFFILE;
-			return tERROR;
+			errorType = TokErrType::eENDOFFILE;
+			return TokenType::tERROR;
 		}
 		
 		// newline?
@@ -379,15 +416,15 @@ public:
 			flushFlag = true;
 
 			// set error
-			errorType = eINVALIDINPUT;
+			errorType = TokErrType::eINVALIDINPUT;
 
 			cout << "StateData(" << currentState->getData() << ")\n";
 
-			return tERROR;
+			return TokenType::tERROR;
 		}
 
 		// set no error
-		errorType = eNOERROR;
+		errorType = TokErrType::eNOERROR;
 
 		// process transition option
 		switch (static_cast<TransitionOption>(opt)) {
@@ -408,51 +445,28 @@ public:
 		StateData stateData = static_cast<StateData>(nextState->getData());
 		if (stateData == StateData::nonf) {
 			currentState = nextState;
-			return tNULL;
+			return TokenType::tNULL;
 		}
 		else {
 			flushFlag = true;
 			currentState = states["init"];
-			switch (stateData) {
-			case StateData::fID:		return static_cast<TokenType>(findKeyword(tokenBuffer));
-			case StateData::fNUM:		return tNUM;
-			case StateData::fADD:		return tADD;
-			case StateData::fSUB:		return tSUB;
-			case StateData::fMUL:		return tMUL;
-			case StateData::fDIV:		return tDIV;
-			case StateData::fLT:		return tLT;
-			case StateData::fLTE:		return tLTE;
-			case StateData::fGT:		return tGT;
-			case StateData::fGTE:		return tGTE;
-			case StateData::fEQ:		return tEQ;
-			case StateData::fNEQ:		return tNEQ;
-			case StateData::fASSIGN:	return tASSIGN;
-			case StateData::fENDS:		return tENDS;
-			case StateData::fCOMMA:		return tCOMMA;
-			case StateData::fLP:		return tLP;
-			case StateData::fRP:		return tRP;
-			case StateData::fLSB:		return tLSB;
-			case StateData::fRSB:		return tRSB;
-			case StateData::fLCB:		return tLCB;
-			case StateData::fRCB:		return tRCB;
-			case StateData::fCOMMENT:	return tCOMMENT;
-			default:
-				errorType = eNOMATCHINGTTYPE;
-				return tERROR;
-			}
+			return stateToToken(stateData);
 		}
 	}
 
-	void processToken() {
-
+	TokenType processToken() {
+		TokenType t;
+		while ((t = processChar()) != TokenType::tNULL) {
+			return t;
+		}
 	}
 
 	string getToken() {
 		return tokenBuffer;
 	}
 
-	ErrorType getErrorType() {
-		return static_cast<ErrorType>(errorType);
+	TokErrType getErrorType() {
+		return errorType;
 	}
 };
 
