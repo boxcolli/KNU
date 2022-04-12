@@ -4,17 +4,19 @@
 #include <list>
 
 typedef struct ScanResult {
-    TokenType ttype;
-    TokErrType etype;
-    string name;
-};
+    TokenType ttype = TokenType::tNULL;
+    TokErrType etype = TokErrType::eNOERROR;
+    string name = "";
+} ScanResult;
+
+static string fname = "2.c";
 
 int main() {
-    ifstream f_scan("1.c");
+    ifstream f_scan(fname);
     Scanner scanner(&f_scan);
     TokenType tresult;
     
-    ifstream f_print("1.c");
+    ifstream f_print(fname);
     string buffer;
     if (!(getline(f_print, buffer))) {
         exit(1);
@@ -27,6 +29,9 @@ int main() {
     while (loop) {
         // process one char
         tresult = scanner.processChar();
+
+
+
 
         // check token result
         if (tresult == TokenType::tNULL) {
@@ -57,10 +62,17 @@ int main() {
             linetokens.push_back(r);
         }
 
+
+
+
+
         // check newline
         if (scanner.isNewLine()) {
-            // print out a line
+
+
+            // print out line
             cout << linecount << ": " << buffer << endl;
+
 
             // print out token list
             for (auto r : linetokens) {

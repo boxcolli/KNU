@@ -3,8 +3,7 @@
 
 #include "globals.h"
 
-const string ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ\
-						abcdefghijklmnopqrstuvwxyz";
+const string ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 const string NUMDIGIT = "0123456789";
 const string OTHERCHAR = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 const string WHITESPACE = " \t\n\v\f\r";
@@ -74,11 +73,11 @@ class FileHeader {
 private:
 	ifstream* fin;
 	string buffer;
-	int length;
+	size_t length;
 	int cursor;
 
-	char putBackChar;
-	bool putBackFlag;
+	char putBackChar = '\0';
+	bool putBackFlag = false;
 
 public:
 	FileHeader(ifstream* fin) : fin(fin) {
@@ -116,7 +115,7 @@ public:
 };
 
 /**************************************************
-Scanner output	
+Scanner output type
 **************************************************/
 typedef enum class TokenType {
 		tERROR = -1,
@@ -127,7 +126,7 @@ typedef enum class TokenType {
 		tASSIGN, tENDS, tCOMMA,
 		tLP, tRP, tLSB, tRSB, tLCB, tRCB,
 		tCOMMENT
-	};
+	} TokenType;
 
 typedef enum class TokErrType {
 	eNOERROR,
@@ -135,7 +134,7 @@ typedef enum class TokErrType {
 	eINVALIDINPUT,
 	eNOCOMMENTEND,
 	eENDOFFILE
-};
+} TokErrType;
 
 /******************************
 *Scanner	
@@ -169,11 +168,11 @@ private:
 		fASSIGN, fENDS, fCOMMA,
 		fLP, fRP, fLSB, fRSB, fLCB, fRCB,
 		fCOMMENT
-	};
+	} StateData;
 
 	typedef enum class TransitionOption {
 		optNORMAL, optLOOKAHEAD, optDISCARD
-	};
+	} TransitionOption;
 
 
 	void addState(string name, StateData data = StateData::nonf) {
