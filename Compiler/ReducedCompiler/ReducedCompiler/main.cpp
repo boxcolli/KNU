@@ -9,7 +9,7 @@ typedef struct ScanResult {
     string name = "";
 } ScanResult;
 
-static string fname = "2.c";
+static string fname = "3.c";
 
 int main() {
     ifstream f_scan(fname);
@@ -26,6 +26,7 @@ int main() {
     list<ScanResult> linetokens;
 
     bool loop = true;
+    bool forceprint = false;
     while (loop) {
         // process one char
         tresult = scanner.processChar();
@@ -41,9 +42,22 @@ int main() {
             // error
             TokErrType e = scanner.getErrorType();
             if (e == TokErrType::eENDOFFILE) {
+                // print final line and end
                 loop = false;
+                forceprint = true;
+            }
+            else if (e == TokErrType::eNOCOMMENTEND) {
+                // print final line with error and end
+                loop = false;
+                forceprint = true;
+                ScanResult r;
+                r.ttype = tresult;
+                r.etype = e;
+                r.name = scanner.getToken();
+                linetokens.push_back(r);
             }
             else {
+                // print error and continue
                 ScanResult r;
                 r.ttype = tresult;
                 r.etype = e;
@@ -67,8 +81,8 @@ int main() {
 
 
         // check newline
-        if (scanner.isNewLine()) {
-
+        if (scanner.isNewLine() || forceprint) {
+            forceprint = false;
 
             // print out line
             cout << linecount << ": " << buffer << endl;
@@ -115,7 +129,7 @@ int main() {
 		        case TokenType::tNEQ:
                     cout << "!=" << endl; break;
 		        case TokenType::tASSIGN:
-                    cout << "==" << endl; break;
+                    cout << "=" << endl; break;
 		        case TokenType::tENDS:
                     cout << ";" << endl; break;
 		        case TokenType::tCOMMA:

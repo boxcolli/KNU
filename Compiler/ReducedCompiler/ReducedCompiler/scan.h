@@ -98,8 +98,9 @@ public:
 		}
 		// buffer empty
 		else {
+			buffer = "";
 			getline(*fin, buffer);
-			if (fin->eof()) {
+			if (buffer == "" && fin->eof()) {
 				return EOF;
 			}
 			length = buffer.length();
