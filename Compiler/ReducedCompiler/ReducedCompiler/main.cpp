@@ -152,13 +152,15 @@ int main() {
                     // error
 			        switch (r.etype) {
                     case TokErrType::eNOMATCHINGTTYPE:
-                        cout << "Error) no matching token type found: " << r.name << endl; break;
+                        cout << "error: no matching token type found: " << r.name << endl; break;
                     case TokErrType::eINVALIDINPUT:
-                        cout << "Error) invalid input: " << r.name << endl; break;
+                        cout << "error: invalid input: " << r.name << endl; break;
                     case TokErrType::eNOCOMMENTEND:
-                        cout << "Error) missing comment end '*/'" << endl; break;
+                        cout << "error: missing comment end '*/'" << endl; break;
+                    case TokErrType::eINVALIDRULE:
+                        cout << "error: incomplete token: " << r.name << endl; break;
                     default:
-                        cout << "Error) unknown" << endl; break;
+                        cout << "error: unknown" << endl; break;
                     }
 		        }
             }

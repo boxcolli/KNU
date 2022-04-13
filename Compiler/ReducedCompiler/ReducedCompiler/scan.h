@@ -133,6 +133,7 @@ typedef enum class TokErrType {
 	eNOERROR,
 	eNOMATCHINGTTYPE,
 	eINVALIDINPUT,
+	eINVALIDRULE,
 	eNOCOMMENTEND,
 	eENDOFFILE
 } TokErrType;
@@ -262,17 +263,20 @@ private:
 		mapState("COMMENT", "COMMENT",
 					ALPHABET + NUMDIGIT +
 					dropChars(OTHERCHAR, "*")
-					+ WHITESPACE);	// ignore comments
+					+ WHITESPACE,
+			TransitionOption::optDISCARD);	// ignore comments
 
 		addState("COMMENT2");
 		mapState("COMMENT", "COMMENT2", "*");
 		mapState("COMMENT2", "COMMENT",
 					ALPHABET + NUMDIGIT +
 					dropChars(OTHERCHAR, "*")
-					+ WHITESPACE);
+					+ WHITESPACE,
+			TransitionOption::optDISCARD);
 
 		addState("COMMENTend", StateData::fCOMMENT);
-		mapState("COMMENT2", "COMMENTend", "/");
+		mapState("COMMENT2", "COMMENTend", "/",
+			TransitionOption::optDISCARD);
 	}
 	// processing: <, <=
 	void buildLT_LTE() {
@@ -348,7 +352,6 @@ private:
 		case StateData::fRSB:		return TokenType::tRSB;
 		case StateData::fLCB:		return TokenType::tLCB;
 		case StateData::fRCB:		return TokenType::tRCB;
-		case StateData::fCOMMENT:	return TokenType::tCOMMENT;
 		default:
 			errorType = TokErrType::eNOMATCHINGTTYPE;
 			return TokenType::tERROR;
@@ -382,21 +385,18 @@ public:
 		if (in == EOF) {
 			if (currentState == states["COMMENT"]
 				|| currentState == states["COMMENTS2"]) {
+				// COMMENT not closed
 				errorType = TokErrType::eNOCOMMENTEND;
 			}
 			else {
+				// normal EOF
 				errorType = TokErrType::eENDOFFILE;
-			}			
+			}
 			return TokenType::tERROR;
 		}
 		
 		// newline?
-		if (in == '\n') {
-			newline = true;
-		}
-		else {
-			newline = false;
-		}
+		newline = (in == '\n') ? true : false;
 
 		// flush token?
 		if (flushFlag) {
@@ -404,32 +404,50 @@ public:
 			flushFlag = false;
 		}
 
-		// retrieve result from current state
+		// pushChar to current state
 		pair<SingleState*, int> temp = currentState->pushChar(in);
 		SingleState* nextState = temp.first;
 		int opt = temp.second;
 
 		// no result?
 		if (nextState == nullptr) {
-			// force to reset DFA
-			currentState = states["init"];
 
-			// collect char
-			tokenBuffer.push_back(in);
+			// abnormal character
+			if (currentState == states["init"]) {
+				
+				// set error
+				errorType = TokErrType::eINVALIDINPUT;
 
-			// flush next time
-			flushFlag = true;
+				// retriev char
+				tokenBuffer.push_back(in);
 
-			// set error
-			errorType = TokErrType::eINVALIDINPUT;
+				// flush next time
+				flushFlag = true;
+			}
+			// illegal REX rule
+			else {
+				// force to reset DFA
+				currentState = states["init"];
 
-			cout << "StateData(" << currentState->getData() << ")\n";
+				// set error
+				errorType = TokErrType::eINVALIDRULE;
+
+				// release current input
+				fileHeader.putBack(in);
+
+				// flush next time
+				flushFlag = true;
+			}
+			
+			
 
 			return TokenType::tERROR;
 		}
 
 		// set no error
 		errorType = TokErrType::eNOERROR;
+
+
 
 		// process transition option
 		switch (static_cast<TransitionOption>(opt)) {
@@ -446,13 +464,21 @@ public:
 			tokenBuffer.push_back(in);
 		}
 
-		// process state data
+		// get state data
 		StateData stateData = static_cast<StateData>(nextState->getData());
 		if (stateData == StateData::nonf) {
+			// token not made
 			currentState = nextState;
 			return TokenType::tNULL;
 		}
+		else if (stateData == StateData::fCOMMENT) {
+			// comment closed
+			currentState = states["init"];
+			flushFlag = true;
+			return TokenType::tNULL;
+		}
 		else {
+			// token has been made
 			flushFlag = true;
 			currentState = states["init"];
 			return stateToToken(stateData);
