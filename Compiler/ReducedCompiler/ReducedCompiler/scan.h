@@ -92,21 +92,22 @@ public:
 			putBackFlag = false;
 			return putBackChar;
 		}
-		// buffer not empty
-		else if (cursor != length) {
-			return buffer[cursor++];
-		}
-		// buffer empty
-		else {
+
+		// buffer empty?
+		if (cursor == length) {
 			buffer = "";
 			getline(*fin, buffer);
+
+			// EOF?
 			if (buffer == "" && fin->eof()) {
 				return EOF;
 			}
+
 			length = buffer.length();
 			cursor = 0;
-			return '\n';
 		}
+
+		return buffer[cursor++];
 	}
 
 	void putBack(char c) {
@@ -171,6 +172,8 @@ private:
 		fLP, fRP, fLSB, fRSB, fLCB, fRCB,
 		fCOMMENT
 	} StateData;
+
+	string EOFSTR = "";
 
 	typedef enum class TransitionOption {
 		optNORMAL, optLOOKAHEAD, optDISCARD
@@ -239,39 +242,36 @@ private:
 
 		addState("fID", StateData::fID);
 		mapState("ID", "fID",
-			NUMDIGIT + OTHERCHAR + WHITESPACE,
+			NUMDIGIT + OTHERCHAR + WHITESPACE + EOFSTR,
 			TransitionOption::optLOOKAHEAD);
 	}
 	void buildNUM() {
 		mapState("NUM", "NUM", NUMDIGIT);
 		addState("fNUM", StateData::fNUM);
 		mapState("NUM", "fNUM",
-			ALPHABET + OTHERCHAR + WHITESPACE,
+			ALPHABET + OTHERCHAR + WHITESPACE + EOFSTR,
 			TransitionOption::optLOOKAHEAD);
 	}
 	// processing: /, /**/
 	void buildDIV_COMMENT() {
 		addState("fDIV", StateData::fDIV);
 		mapState("DIV_COMMENT", "fDIV",
-			ALPHABET + NUMDIGIT +
-			dropChars(OTHERCHAR, "*")
-			+ WHITESPACE,
+			ALPHABET + NUMDIGIT + dropChars(OTHERCHAR, "*")
+			+ WHITESPACE + EOFSTR,
 			TransitionOption::optLOOKAHEAD);
 
 		addState("COMMENT");
 		mapState("DIV_COMMENT", "COMMENT", "*");
 		mapState("COMMENT", "COMMENT",
-					ALPHABET + NUMDIGIT +
-					dropChars(OTHERCHAR, "*")
-					+ WHITESPACE,
+			ALPHABET + NUMDIGIT + dropChars(OTHERCHAR, "*")
+			+ WHITESPACE,
 			TransitionOption::optDISCARD);	// ignore comments
 
 		addState("COMMENT2");
 		mapState("COMMENT", "COMMENT2", "*");
 		mapState("COMMENT2", "COMMENT",
-					ALPHABET + NUMDIGIT +
-					dropChars(OTHERCHAR, "*")
-					+ WHITESPACE,
+			ALPHABET + NUMDIGIT + dropChars(OTHERCHAR, "*")
+			+ WHITESPACE,
 			TransitionOption::optDISCARD);
 
 		addState("COMMENTend", StateData::fCOMMENT);
@@ -282,9 +282,8 @@ private:
 	void buildLT_LTE() {
 		addState("fLT", StateData::fLT);
 		mapState("LT_LTE", "fLT",
-			ALPHABET + NUMDIGIT +
-			dropChars(OTHERCHAR, "=")
-			+ WHITESPACE,
+			ALPHABET + NUMDIGIT + dropChars(OTHERCHAR, "=")
+			+ WHITESPACE + EOFSTR,
 			TransitionOption::optLOOKAHEAD);
 
 		addState("fLTE", StateData::fLTE);
@@ -294,9 +293,8 @@ private:
 	void buildGT_GTE() {
 		addState("fGT", StateData::fGT);
 		mapState("GT_GTE", "fGT",
-			ALPHABET + NUMDIGIT +
-			dropChars(OTHERCHAR, "=")
-			+ WHITESPACE,
+			ALPHABET + NUMDIGIT + dropChars(OTHERCHAR, "=")
+			+ WHITESPACE + EOFSTR,
 			TransitionOption::optLOOKAHEAD);
 
 		addState("fGTE", StateData::fGTE);
@@ -309,9 +307,8 @@ private:
 
 		addState("fASSIGN", StateData::fASSIGN);
 		mapState("EQ_ASSIGN", "fASSIGN",
-			ALPHABET + NUMDIGIT +
-			dropChars(OTHERCHAR, "=")
-			+ WHITESPACE,
+			ALPHABET + NUMDIGIT + dropChars(OTHERCHAR, "=")
+			+ WHITESPACE + EOFSTR,
 			TransitionOption::optLOOKAHEAD);
 	}
 	void buildNEQ() {
@@ -364,6 +361,8 @@ public:
 							tokenBuffer(""),
 							flushFlag(false),
 							errorType(TokErrType::eNOERROR) {
+		EOFSTR.push_back(EOF);
+
 		// build DFA
 		buildState();
 		buildInit();
@@ -380,20 +379,6 @@ public:
 
 	TokenType processChar() {
 		char in = fileHeader.getChar();
-
-		// EOF?
-		if (in == EOF) {
-			if (currentState == states["COMMENT"]
-				|| currentState == states["COMMENTS2"]) {
-				// COMMENT not closed
-				errorType = TokErrType::eNOCOMMENTEND;
-			}
-			else {
-				// normal EOF
-				errorType = TokErrType::eENDOFFILE;
-			}
-			return TokenType::tERROR;
-		}
 		
 		// newline?
 		newline = (in == '\n') ? true : false;
@@ -412,19 +397,28 @@ public:
 		// no result?
 		if (nextState == nullptr) {
 
-			// abnormal character
+			// character
 			if (currentState == states["init"]) {
-				
-				// set error
-				errorType = TokErrType::eINVALIDINPUT;
+				if (in == EOF) {
+					errorType = TokErrType::eENDOFFILE;
+				}
+				else {
+					// set error
+					errorType = TokErrType::eINVALIDINPUT;
 
-				// retriev char
-				tokenBuffer.push_back(in);
+					// retriev char
+					tokenBuffer.push_back(in);
 
-				// flush next time
-				flushFlag = true;
+					// flush next time
+					flushFlag = true;
+				}
 			}
-			// illegal REX rule
+			// comment not closed
+			else if (currentState == states["COMMENT"]
+				|| currentState == states["COMMENTS2"]) {
+				errorType = TokErrType::eNOCOMMENTEND;
+			}
+			// invalid REX rule
 			else {
 				// force to reset DFA
 				currentState = states["init"];
@@ -432,14 +426,12 @@ public:
 				// set error
 				errorType = TokErrType::eINVALIDRULE;
 
-				// release current input
+				// re-process current input
 				fileHeader.putBack(in);
 
 				// flush next time
 				flushFlag = true;
 			}
-			
-			
 
 			return TokenType::tERROR;
 		}
