@@ -105,6 +105,7 @@ public:
 
 			length = buffer.length();
 			cursor = 0;
+			return '\n';
 		}
 
 		return buffer[cursor++];
@@ -242,23 +243,32 @@ private:
 
 		addState("fID", StateData::fID);
 		mapState("ID", "fID",
-			NUMDIGIT + OTHERCHAR + WHITESPACE + EOFSTR,
+			NUMDIGIT + OTHERCHAR,
 			TransitionOption::optLOOKAHEAD);
+		mapState("ID", "fID",
+			WHITESPACE + EOFSTR,
+			TransitionOption::optDISCARD);
 	}
 	void buildNUM() {
 		mapState("NUM", "NUM", NUMDIGIT);
+
 		addState("fNUM", StateData::fNUM);
 		mapState("NUM", "fNUM",
-			ALPHABET + OTHERCHAR + WHITESPACE + EOFSTR,
+			ALPHABET + OTHERCHAR,
 			TransitionOption::optLOOKAHEAD);
+		mapState("NUM", "fNUM",
+			WHITESPACE + EOFSTR,
+			TransitionOption::optDISCARD);
 	}
 	// processing: /, /**/
 	void buildDIV_COMMENT() {
 		addState("fDIV", StateData::fDIV);
 		mapState("DIV_COMMENT", "fDIV",
-			ALPHABET + NUMDIGIT + dropChars(OTHERCHAR, "*")
-			+ WHITESPACE + EOFSTR,
+			ALPHABET + NUMDIGIT + dropChars(OTHERCHAR, "*"),
 			TransitionOption::optLOOKAHEAD);
+		mapState("DIV_COMMENT", "fDIV",
+			WHITESPACE + EOFSTR,
+			TransitionOption::optDISCARD);
 
 		addState("COMMENT");
 		mapState("DIV_COMMENT", "COMMENT", "*");
@@ -282,9 +292,11 @@ private:
 	void buildLT_LTE() {
 		addState("fLT", StateData::fLT);
 		mapState("LT_LTE", "fLT",
-			ALPHABET + NUMDIGIT + dropChars(OTHERCHAR, "=")
-			+ WHITESPACE + EOFSTR,
+			ALPHABET + NUMDIGIT + dropChars(OTHERCHAR, "="),
 			TransitionOption::optLOOKAHEAD);
+		mapState("LT_LTE", "fLT",
+			WHITESPACE + EOFSTR,
+			TransitionOption::optDISCARD);
 
 		addState("fLTE", StateData::fLTE);
 		mapState("LT_LTE", "fLTE", "=");
@@ -293,9 +305,11 @@ private:
 	void buildGT_GTE() {
 		addState("fGT", StateData::fGT);
 		mapState("GT_GTE", "fGT",
-			ALPHABET + NUMDIGIT + dropChars(OTHERCHAR, "=")
-			+ WHITESPACE + EOFSTR,
+			ALPHABET + NUMDIGIT + dropChars(OTHERCHAR, "="),
 			TransitionOption::optLOOKAHEAD);
+		mapState("GT_GTE", "fGT",
+			WHITESPACE + EOFSTR,
+			TransitionOption::optDISCARD);
 
 		addState("fGTE", StateData::fGTE);
 		mapState("GT_GTE", "fGTE", "=");
@@ -307,9 +321,11 @@ private:
 
 		addState("fASSIGN", StateData::fASSIGN);
 		mapState("EQ_ASSIGN", "fASSIGN",
-			ALPHABET + NUMDIGIT + dropChars(OTHERCHAR, "=")
-			+ WHITESPACE + EOFSTR,
+			ALPHABET + NUMDIGIT + dropChars(OTHERCHAR, "="),
 			TransitionOption::optLOOKAHEAD);
+		mapState("EQ_ASSIGN", "fASSIGN",
+			WHITESPACE + EOFSTR,
+			TransitionOption::optDISCARD);
 	}
 	void buildNEQ() {
 		addState("fNEQ", StateData::fNEQ);

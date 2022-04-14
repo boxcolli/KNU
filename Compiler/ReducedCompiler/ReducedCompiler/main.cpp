@@ -9,7 +9,7 @@ typedef struct ScanResult {
     string name = "";
 } ScanResult;
 
-static string fname = "3.c";
+static string fname = "1.c";
 
 int main() {
     ifstream f_scan(fname);
@@ -35,10 +35,7 @@ int main() {
 
 
         // check token result
-        if (tresult == TokenType::tNULL) {
-            // do nothing
-        }
-        else if (tresult == TokenType::tERROR) {
+        if (tresult == TokenType::tERROR) {
             // error
             TokErrType e = scanner.getErrorType();
             if (e == TokErrType::eENDOFFILE) {
@@ -65,10 +62,7 @@ int main() {
                 linetokens.push_back(r);
             }
         }
-        else if (tresult == TokenType::tCOMMENT) {
-            // do nothing
-        }
-        else {
+        else if (tresult != TokenType::tNULL) {
             // a token has been made
             ScanResult r;
             r.ttype = tresult;
@@ -146,8 +140,6 @@ int main() {
                     cout << "{" << endl; break;
 		        case TokenType::tRCB:
                     cout << "}" << endl; break;
-		        case TokenType::tCOMMENT:
-                    break;
 		        default:
                     // error
 			        switch (r.etype) {
