@@ -188,6 +188,8 @@ private:
 	void mapState(string from, string to,
 		string instring,
 		TransitionOption opt = TransitionOption::optNORMAL) {
+		// state 사이에 transition을 만듭니다.
+		// 입력 문자를 코드 편의를 위해 스트링으로 한번에 처리합니다.
 		SingleState* s1 = states[from];
 		SingleState* s2 = states[to];
 		for (char in : instring) {
@@ -218,6 +220,7 @@ private:
 		addState("RCB", StateData::fRCB);
 	}
 	void buildInit() {
+		// init과 각 REX의 state 사이 transition을 잇습니다.
 		mapState("init", "init", WHITESPACE, TransitionOption::optDISCARD);
 		mapState("init", "ID", ALPHABET);
 		mapState("init", "NUM", NUMDIGIT);

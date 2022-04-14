@@ -9,7 +9,7 @@ typedef struct ScanResult {
     string name = "";
 } ScanResult;
 
-static string fname = "1.c";
+static string fname = "2.c";
 
 int main() {
     ifstream f_scan(fname);
