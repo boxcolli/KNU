@@ -283,7 +283,7 @@ private:
 		addState("COMMENT2");
 		mapState("COMMENT", "COMMENT2", "*");
 		mapState("COMMENT2", "COMMENT",
-			ALPHABET + NUMDIGIT + dropChars(OTHERCHAR, "*")
+			ALPHABET + NUMDIGIT + dropChars(OTHERCHAR, "/")
 			+ WHITESPACE,
 			TransitionOption::optDISCARD);
 
