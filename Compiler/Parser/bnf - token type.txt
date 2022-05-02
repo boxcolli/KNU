@@ -1,0 +1,29 @@
+<program> ::= <declaration-list>
+<declaration-list> ::= <declaration-list> <declaration> | <declaration>
+<declaration> ::= <var-declaration> | <fun-declaration>
+<var-declaration> ::= <type-specifier> ID SEMI | <type-specifier> ID LSBRACK NUM RSBRACK ;
+<type-specifier> ::= INT | VOID
+<fun-declaration> ::= <type-specifier> ID LPAREN <params> RPAREN <compound-stmt>
+<params> ::= <param-list> | VOID
+<param-list> ::= <param-list> COMMA <param> | <param>
+<param> ::= <type-specifier> ID | <type-specifier> ID LSBRACK RSBRACK
+<compound-stmt> ::= LCBRACK <locaUdeclarations> <statement-list> RCBRACK
+<local-declarations> ::= <local-declarations> <var-declaration> | EMPTY
+<statement-list> ::= <statement-list> <statement> | EMPTY
+<statement> ::= <expression-stmt> | compound-stmt | selection-stmt | ieration-stmt | return-stmt
+expession-stmt ::= expression ; | ;
+selection-stmt ::= if ( expression ) statement | if ( expression ) statement else statement
+iteration-stmt ::= while ( expression ) statement
+retum-stmt ::= return ; | return expression ;
+expression ::= var = expression | simple-expression
+var ::= ID | ID [ expression ]
+simple-expression ::= additive-expression relop additive-expression | additive-expression
+relop ::= <= | < | > | >= | == | !=
+additive-expression ::= additive-expression addop term | term
+addop ::= + | -
+term ::= term mulop factor | factor
+mulop —» * | /
+factor —> ( expression ) | var | call | NUM
+call ::= ID ( args )
+args ::= arg-list | empty
+arg-list ::= arg-list , expression | expression
