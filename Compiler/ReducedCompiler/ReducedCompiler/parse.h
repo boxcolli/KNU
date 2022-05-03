@@ -1,6 +1,19 @@
 #ifndef _PARSE_H_
 #define _PARSE_H_
 
-class Parser;
+class FirstFollow {
+private:
+
+public:
+	FirstFollow();
+	
+};
+
+class Parser {
+private:
+
+public:
+
+};
 
 #endif

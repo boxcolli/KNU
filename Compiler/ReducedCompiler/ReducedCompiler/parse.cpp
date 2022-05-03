@@ -1,11 +1,9 @@
 #include "globals.h"
+#include "parse.h"
 
-class FirstFollow {
-private:
+FirstFollow::FirstFollow() {
 
-public:
-
-};
+}
 
 class Parser {
 private:
@@ -13,6 +11,7 @@ private:
 
 
 public:
+
 
 
 };
