@@ -4,6 +4,7 @@
 #include <fstream>
 #include <map>
 #include <string>
+#include <vector>
 #include <iostream>
 using namespace std;
 

@@ -1,6 +1,8 @@
 #ifndef _STATE_H_
 #define _STATE_H_
 
+#include "globals.h"
+
 class SingleState {
 private:
 
@@ -28,6 +30,12 @@ public:
 	int getData();
 };
 
-
+template<typename T>
+class ListState : SingleState {
+private:
+	vector<T> l;
+public:
+	ListState(T l);
+};
 
 #endif

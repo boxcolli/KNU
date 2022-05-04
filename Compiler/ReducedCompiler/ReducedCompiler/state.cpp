@@ -20,3 +20,5 @@ pair<SingleState*, int> SingleState::pushChar(char in) {
 int SingleState::getData() {
 	return data;
 }
+
+// ListState::ListState()
