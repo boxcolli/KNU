@@ -3,7 +3,13 @@
 
 class FirstFollow {
 private:
+	// map term
+	// map nont
 
+	// map 
+
+	// map first
+	// map follow
 public:
 	FirstFollow();
 	

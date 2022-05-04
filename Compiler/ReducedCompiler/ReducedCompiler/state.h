@@ -3,39 +3,42 @@
 
 #include "globals.h"
 
-class SingleState {
+template <typename Data, typename In, typename Opt>
+class FiniteState {
 private:
 
 	/// Can hold any optional data. For example, non-final, final or else.
-	int data;
+	Data data;
 
 	/// Holds transition data, with transition option
-	map<char, pair<SingleState*, int>> transition;
+	map<char, pair<FiniteState*, Opt>> transition;
 
 public:
 
-	SingleState(int data = -1);
+	FiniteState(Data data) : data(data) {}
 
 	/// Add a transition from this state to another.
 	/// in: A single input character
 	/// next: Pointer to another state
-	void addMap(char in, SingleState* next, int opt);
+	void addMap(In in, FiniteState* next, Opt opt) {
+		transition[in] = make_pair(next, opt);
+	}
 
 	/// Push a single input character to make transition
 	/// in: A single input character</param>
-	/// returns nullptr if not found or mapped. SingleState* if found.
-	pair<SingleState*, int> pushChar(char in);
+	/// returns nullptr if not found or mapped. FiniteState* if found.
+	pair<FiniteState*, int> pushInput(In in) {
+		auto search = transition.find(in);
+		if (search == transition.end()) {
+			return make_pair(nullptr, -1);
+		}
+		else {
+			return search->second;
+		}
+	}
 
 	/// returns assigned data for this state.
-	int getData();
-};
-
-template<typename T>
-class ListState : SingleState {
-private:
-	vector<T> l;
-public:
-	ListState(T l);
+	DT getData() { return data; }
 };
 
 #endif
