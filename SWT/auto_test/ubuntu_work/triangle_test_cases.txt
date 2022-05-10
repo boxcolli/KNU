@@ -1,5 +1,6 @@
 /* function prototype at the first line */
 /* from the second line: test_no, param1, param2, param3, expected_output */
+int triangle(int a, int b, int c)
 1 2 2 4 2 
 2 3 2 4 3
 3 3 3 3 0 

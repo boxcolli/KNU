@@ -1,7 +1,21 @@
 SUT.c
 	첫 줄 가져옴
+	함수 이름 추출
+
+CASE.txt
 	
 
+MAIN.cpp
+	SUT.c 열기
+	SUT.c 처리
+	CASE.txt 열기
+	CASE.txt 처리
+	SUT_DRIVER.c 열기
+		#include 쓰기
+		#include "SUT.c"
+		함수 선언 쓰기
+		int main() { 쓰기
+		
 
 
 stub

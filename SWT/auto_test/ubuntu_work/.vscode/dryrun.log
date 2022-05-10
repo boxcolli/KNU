@@ -1,0 +1,6 @@
+make --dry-run --keep-going --print-directory
+make: Entering directory '/home/yoonmin/문서/Git/KNU/SWT/auto_test/ubuntu_work'
+g++ -c -o classes.o classes.cpp
+g++ -o a.out classes.o main.o
+make: Leaving directory '/home/yoonmin/문서/Git/KNU/SWT/auto_test/ubuntu_work'
+ 
