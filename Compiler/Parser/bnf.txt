@@ -22,7 +22,7 @@ relop -> <= | < | > | >= | == | !=
 additive-expression -> additive-expression addop term | term
 addop -> + | -
 term -> term mulop factor | factor
-mulop —» * | /
+mulop —> * | /
 factor —> ( expression ) | var | call | NUM
 call -> ID ( args )
 args -> arg-list | empty
