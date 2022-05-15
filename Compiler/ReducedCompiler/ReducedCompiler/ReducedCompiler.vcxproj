@@ -145,6 +145,7 @@
     <ClCompile Include="state.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="fhead.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="parse.h" />
     <ClInclude Include="scan.h" />

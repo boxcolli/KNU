@@ -3,7 +3,7 @@
 
 #include "globals.h"
 
-template <typename Data, typename In, typename Opt>
+template <typename Data, typename In, typename Opt, typename State>
 class FiniteState {
 public:
 
@@ -12,20 +12,18 @@ public:
 	/// Add a transition from this state to another.
 	/// in: A single input character
 	/// next: Pointer to another state
-	template <typename State>
-	virtual void addMap(In in, State* next, Opt opt) {
+	void addMap(In in, State* next, Opt opt) {
 		transition[in] = make_pair(next, opt);
 	}
 
 	/// Push a single input character to make transition
 	/// in: A single input character</param>
-	/// returns nullptr if not found or mapped. FiniteState* if found.
-	template <typename State>
-	virtual pair<State*, Opt> pushInput(In in) {
-		auto search = transition.find(in);
+	/// returns nullptr if not found or mapped. FiniteState* if found
+	pair<State*, Opt> pushInput(char in) {
+		auto search = FiniteState::transition.find(in);
 		if (search == transition.end()) {
 			// not found
-			return make_pair(nullptr, -1);
+			return make_pair(nullptr, static_cast<Opt>(-1));
 		}
 		else {
 			// return value
@@ -34,7 +32,7 @@ public:
 	}
 
 	/// returns assigned data for this state.
-	DT getData() { return data; }
+	Data getData() { return data; }
 	
 private:
 
@@ -42,7 +40,7 @@ private:
 	Data data;
 
 	/// Holds transition data, with transition option
-	map<char, pair<FiniteState*, Opt>> transition;
+	map<In, pair<State*, Opt>> transition;
 
 };
 

@@ -3,8 +3,9 @@
 
 #include "globals.h"
 #include "state.h"
+#include "fhead.h"
 
-class GrammarParser {
+class GrammarHandler {
 public:
 	
 private:
