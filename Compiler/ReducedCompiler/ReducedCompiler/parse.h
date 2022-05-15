@@ -1,6 +1,9 @@
 #ifndef _PARSE_H_
 #define _PARSE_H_
 
+#include "globals.h"
+#include "state.h"
+
 class GrammarParser {
 public:
 	

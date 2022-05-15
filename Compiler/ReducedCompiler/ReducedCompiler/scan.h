@@ -2,6 +2,7 @@
 #define _SCAN_H_
 
 #include "globals.h"
+#include "state.h"
 
 const string ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 const string NUMDIGIT = "0123456789";
@@ -25,6 +26,22 @@ string dropChars(const string base, string chars) {
 /**************************************************
 Basic form of state
 **************************************************/
+typedef enum class TransitionOption {
+	optNORMAL, optLOOKAHEAD, optDISCARD
+} TransitionOption;
+
+class SingleState : public FiniteState<int, char, TransitionOption> {
+public:
+	void addMap2(int in, SingleState* next, TransitionOption opt) {
+		FiniteState::addMap(in, next, opt);
+	}
+
+	pair<SingleState*, TransitionOption> pushInput(char in) {
+		FiniteState::pushInput(in);
+	} 
+private:
+}
+
 class SingleState {
 private:
 
@@ -175,10 +192,6 @@ private:
 	} StateData;
 
 	string EOFSTR = "";
-
-	typedef enum class TransitionOption {
-		optNORMAL, optLOOKAHEAD, optDISCARD
-	} TransitionOption;
 
 
 	void addState(string name, StateData data = StateData::nonf) {

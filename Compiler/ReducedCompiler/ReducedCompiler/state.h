@@ -13,7 +13,7 @@ public:
 	/// in: A single input character
 	/// next: Pointer to another state
 	template <typename State>
-	void addMap(In in, State* next, Opt opt) {
+	virtual void addMap(In in, State* next, Opt opt) {
 		transition[in] = make_pair(next, opt);
 	}
 
@@ -21,7 +21,7 @@ public:
 	/// in: A single input character</param>
 	/// returns nullptr if not found or mapped. FiniteState* if found.
 	template <typename State>
-	pair<State*, Opt> pushInput(In in) {
+	virtual pair<State*, Opt> pushInput(In in) {
 		auto search = transition.find(in);
 		if (search == transition.end()) {
 			// not found
