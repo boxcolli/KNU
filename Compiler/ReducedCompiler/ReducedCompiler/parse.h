@@ -35,7 +35,8 @@ private:
 	string tokenBuffer;
 
 	enum class StateData {
-		nonf, f
+		nonf,
+		lbegin, lend, rbegin, rend
 	};
 
 	void addState(string name, StateData data = StateData::nonf) {
