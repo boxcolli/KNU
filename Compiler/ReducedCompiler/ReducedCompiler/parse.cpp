@@ -5,8 +5,13 @@
 /**************************************************
 Grammar Handler
 **************************************************/
-GrammarHandler::GrammarHandler() {
+GrammarHandler::GrammarHandler(ifstream* f) {
+    fHeader = FileHeader(f);
 
+    buildStates();
+}
+void GrammarHandler::buildStates() {
+    
 }
 /**************************************************
 First Follow
