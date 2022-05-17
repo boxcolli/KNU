@@ -10,6 +10,8 @@
         "type_traits": "cpp",
         "vector": "cpp",
         "xmemory": "cpp",
-        "xstddef": "cpp"
+        "xstddef": "cpp",
+        "iosfwd": "cpp",
+        "fstream": "cpp"
     }
 }

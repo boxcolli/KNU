@@ -53,6 +53,8 @@ public:
 		putBackChar = c;
 		putBackFlag = true;
 	}
+
+	string getBuffer() { return buffer; }
 };
 
 #endif
