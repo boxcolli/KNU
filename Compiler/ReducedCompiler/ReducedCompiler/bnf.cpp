@@ -25,7 +25,7 @@ BNFScanner::BNFScanner(ifstream* f) : fHeader(FileHeader(f)), tokenBuffer("") {
     addState("assign_0");
     addState("assign_1");
     addState("assign_2", TType::assign);
-    addState("or", TType::or);
+    addState("or", TType::op_or);
 
     mapState("init", "init", WHITESPACE);
     // symbol
@@ -36,7 +36,7 @@ BNFScanner::BNFScanner(ifstream* f) : fHeader(FileHeader(f)), tokenBuffer("") {
     // terminal
     mapState("init", "term_begin", ALPHABET);
     mapState("term_begin", "term_begin", ALPHABET + "-" + NUMDIGIT);
-    mapState("term_begin", "term_end", WHITESPACE);
+    mapState("term_begin", "term_end", WHITESPACE + NEWLINE);
     // assign
     mapState("init", "assign_0", ":");
     mapState("assign_0", "assign_1", ":");
@@ -46,9 +46,15 @@ BNFScanner::BNFScanner(ifstream* f) : fHeader(FileHeader(f)), tokenBuffer("") {
     // member
     initState = states["init"];
     currentState = initState;
+    flushData = false;
 }
 
 BNFScanner::TType BNFScanner::pushInput() {
+    if (flushData) {
+        flushData = false;
+        tokenBuffer = "";
+        tokenType = TType::empty;
+    }
     char in = fHeader.getChar();
 
     // newline?
@@ -69,17 +75,33 @@ BNFScanner::TType BNFScanner::pushInput() {
 
     // ignore some state
     auto data = static_cast<TType>(state->getData());
-    if (data == TType::empty) {  return TType::empty; }
+    if (data == TType::empty) {
+        currentState = state;
+        return TType::empty;
+    }
 
     // return token
     switch (data) {    
     case TType::symbol:
     case TType::term:
     case TType::assign:
-    case TType::or:
+    case TType::op_or:
+        currentState = initState;
+        flushData = true;
+        tokenType = data;
         return data;
     default:
         MSG_EXIT("BNF : invalid rule at..." + fHeader.getBuffer());
+    }
+}
+
+bool BNFScanner::process() {
+    TType ttype;
+    while (true) {
+        ttype = pushInput();
+        if (ttype == TType::eof) { return false; }
+        if (ttype == TType::empty) { continue; }
+        return true;
     }
 }
 

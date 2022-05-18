@@ -11,9 +11,11 @@ BNF Scanner
 class _BNFState : public FiniteState<int, char, int, _BNFState> {
 public:
 	_BNFState(int data = -1) : FiniteState(data) {}
+	
 	void addMap(char in, _BNFState* next, int opt = -1) {
 		FiniteState::addMap(in, next, opt);
 	}
+
 	pair<_BNFState*, int> pushInput(char in) {
 		return FiniteState::pushInput(in);
 	}
@@ -23,21 +25,24 @@ class BNFScanner {
 public:
 	BNFScanner(ifstream* f);
 
-    bool next();
-    string getToken() { return tokenBuffer; }
+    bool process();  
+
     enum class TType {
 		eof, empty, newline,
-		symbol, term, assign, or
+		symbol, term, assign, op_or
 	};
-    TType getType() {}; // TODO
+
+    TType getType() { return tokenType; }
+	string getToken() { return tokenBuffer; }
 
 private:
-	FileHeader fHeader;
 	map<string, _BNFState*> states;
-	_BNFState* initState;
-	_BNFState* currentState;
-	string tokenBuffer;
-	TType tokenType;
+	FileHeader	fHeader;
+	_BNFState * initState;
+	_BNFState * currentState;
+	string		tokenBuffer;
+	TType		tokenType;
+	bool		flushData;
 
 	void addState(string name, TType data = TType::empty) {
 		states[name] = new _BNFState(static_cast<int>(data));

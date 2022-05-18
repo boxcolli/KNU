@@ -8,9 +8,6 @@
 #include <iostream>
 using namespace std;
 
-void MSG_EXIT(string msg) {
-    cout << msg << endl;
-    exit(1);
-}
+void MSG_EXIT(string msg);
 
 #endif

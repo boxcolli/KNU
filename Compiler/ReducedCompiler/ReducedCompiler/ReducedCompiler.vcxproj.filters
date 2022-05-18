@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="parse.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -30,25 +27,31 @@
     <ClCompile Include="bnf.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="globals.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="globals.h">
-      <Filter>소스 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="scan.h">
-      <Filter>소스 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="parse.h">
-      <Filter>소스 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="state.h">
-      <Filter>소스 파일</Filter>
+    <ClInclude Include="bnf.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="fhead.h">
-      <Filter>소스 파일</Filter>
+      <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="bnf.h">
-      <Filter>소스 파일</Filter>
+    <ClInclude Include="globals.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="parse.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="scan.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="state.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
