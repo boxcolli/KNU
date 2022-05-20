@@ -2,23 +2,21 @@
 #define _PARSE_H_
 
 #include "globals.h"
-#include "state.h"
+#include "bnf.h"
 
 /**************************************************
 First Follow
 **************************************************/
 class FirstFollow {
 public:
-	FirstFollow();
+	FirstFollow(ifstream& fbnf);
 private:
-	// map term
-	// map nont
-
-	// map 
-
-	// map first
-	// map follow
+	_BNFParser bnfP;
+	map<string, set<string>> firsts;
+	map<string, set<string>> follows;
 	
+	void makeFirsts();
+	void makeFollows();
 };
 /**************************************************
 Parser
@@ -27,7 +25,7 @@ class LR1Parser {
 public:
 	LR1Parser();
 private:
-	
+	_BNFParser bnfP;
 };
 
 #endif

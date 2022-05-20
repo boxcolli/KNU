@@ -1,5 +1,3 @@
-
-
 <program> ::= <declaration-list>
 <declaration-list> ::= <declaration-list> <declaration> | <declaration>
 <declaration> ::= <var-declaration> | <fun-declaration>

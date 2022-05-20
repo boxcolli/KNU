@@ -2,76 +2,58 @@
 #define _BNF_H_
 
 #include "globals.h"
-#include "state.h"
-#include "fhead.h"
+
+enum class TType {
+	error, symbol, term, assign, op_or
+};
+
+struct _rule {
+	string l;	// left hand
+	vector<pair<TType, string>> r;	// right hand
+	
+	_rule() {}
+	_rule(string left) : l(left) {}
+};
+
+typedef vector<_rule> grammar;
 
 /**************************************************
 BNF Scanner
 **************************************************/
-class _BNFState : public FiniteState<int, char, int, _BNFState> {
+class _BNFScanner {
 public:
-	_BNFState(int data = -1) : FiniteState(data) {}
-	
-	void addMap(char in, _BNFState* next, int opt = -1) {
-		FiniteState::addMap(in, next, opt);
-	}
-
-	pair<_BNFState*, int> pushInput(char in) {
-		return FiniteState::pushInput(in);
-	}
-};
-
-class BNFScanner {
-public:
-	BNFScanner(ifstream* f);
-
-    bool process();  
-
-    enum class TType {
-		eof, empty, newline,
-		symbol, term, assign, op_or
-	};
-
-    TType getType() { return tokenType; }
-	string getToken() { return tokenBuffer; }
+	_BNFScanner(ifstream& fbnf);
+    bool process();
+    
+	string getToken() { return token; }
+	TType getTtype() { return ttype; }
 
 private:
-	map<string, _BNFState*> states;
-	FileHeader	fHeader;
-	_BNFState * initState;
-	_BNFState * currentState;
-	string		tokenBuffer;
-	TType		tokenType;
-	bool		flushData;
-
-	void addState(string name, TType data = TType::empty) {
-		states[name] = new _BNFState(static_cast<int>(data));
-	}
-	void mapState(string from, string to, string instring) {
-        _BNFState* fromState = states[from];
-        _BNFState* toState = states[to];
-        for (char c : instring) {
-            fromState->addMap(c, toState);
-        }
-    }
-    TType pushInput(); // TODO
+	ifstream& fbnf;
+	string buffer;
+	vector<string> tokens;
+	string token;
+	TType ttype;
 };
 
 /**************************************************
 BNF Parser
 **************************************************/
-
-typedef string _symbol;
-struct _rhand {
-    bool nullable;
-    
-};
-
-class BNFParser {
+class _BNFParser {
 public:
+	grammar grammar;
+	map<string, pair<int, int>> symmap;
+	set<string> termset;
+	set<string> nullable;
+
+	_BNFParser(ifstream& f);
+	bool isNullable(string symbol);
+	grammar::iterator ruleBegin(string lhand);
+	grammar::iterator ruleEnd(string lhand);
 
 private:
-
+	/* 3 important output */
+	
 };
 
 #endif

@@ -1,3 +1,1 @@
-﻿  bnf.cpp
-C:\Users\mslit\Documents\GitHub\KNU\Compiler\ReducedCompiler\ReducedCompiler\bnf.cpp(96): warning C4715: 'BNFScanner::pushInput': 모든 제어 경로에서 값을 반환하지는 않습니다.
-  ReducedCompiler.vcxproj -> C:\Users\mslit\Documents\GitHub\KNU\Compiler\ReducedCompiler\x64\Debug\ReducedCompiler.exe
+﻿  ReducedCompiler.vcxproj -> C:\Users\mslit\Documents\GitHub\KNU\Compiler\ReducedCompiler\x64\Debug\ReducedCompiler.exe
