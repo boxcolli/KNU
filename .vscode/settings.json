@@ -12,6 +12,7 @@
         "xmemory": "cpp",
         "xstddef": "cpp",
         "iosfwd": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "utility": "cpp"
     }
 }

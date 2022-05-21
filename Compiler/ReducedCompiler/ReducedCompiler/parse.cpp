@@ -150,3 +150,6 @@ void FirstFollow::makeFollows() {
 /**************************************************
 Parser
 **************************************************/
+bool LR1Parser::LR1State::equals(LR1State* s) {
+    return data.k == s->data.k;
+}

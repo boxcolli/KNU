@@ -33,15 +33,12 @@ public:
 
 	/// returns assigned data for this state.
 	Data getData() { return data; }
-	
-private:
 
-	/// Can hold any optional data. For example, non-final, final or else.
+		/// Can hold any optional data. For example, non-final, final or else.
 	Data data;
 
 	/// Holds transition data, with transition option
 	map<In, pair<State*, Opt>> transition;
-
 };
 
 #endif

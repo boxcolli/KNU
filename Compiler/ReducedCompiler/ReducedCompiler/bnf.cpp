@@ -63,88 +63,90 @@ bool _BNFScanner::process() {
 /**************************************************
 BNF Parser
 **************************************************/
-
 _BNFParser::_BNFParser(ifstream& fbnf) {
     _BNFScanner bnfScanner(fbnf);
 
-    // make grammar g;
-    _rule* r = nullptr;
-    _rule* r_temp = nullptr;
-    pair<TType, string>* s_temp = nullptr;
-    while(bnfScanner.process()) {
-        string tok = bnfScanner.getToken();
-        TType type = bnfScanner.getTtype();
-        switch(type) {
+    _rule rule;
+    bool wasSym = false;
+    string lastSym;
+    string tok;
+    TType type;
+    
+    // iterate 0 : symbol
+    bnfScanner.process();
+    tok = bnfScanner.getToken();
+    type = bnfScanner.getTtype();
+    if (type!=TType::symbol) { MSG_EXIT("bnf : invalid left-hand"); }
+    rule.l = tok;
+    // iterate 1 : assign
+    bnfScanner.process();
+    type = bnfScanner.getTtype();
+    if (type != TType::assign) { MSG_EXIT("bnf : expected assign, but not found"); }
+    wasSym = false;
+    // iterate 2~
+    while (bnfScanner.process()) {
+        tok = bnfScanner.getToken();
+        type = bnfScanner.getTtype();
+        switch (type) {
         case TType::symbol:
-            // write symbol temp
-            if (s_temp != nullptr) {
-                r->r.push_back(*s_temp);
-            }
-            // write new symbol temp
-            s_temp = new pair<TType, string>(type, tok);
+            if (wasSym) // symbol -> rule.right-hand
+                { rule.r.push_back(make_pair(TType::symbol, lastSym)); }
+            wasSym = true;  // memo symbol
+            lastSym = tok;
             break;
 
         case TType::term:
-            // write symbol temp
-            if (s_temp != nullptr) {
-                r->r.push_back(*s_temp);
-                s_temp = nullptr;
-            }
-            // write term
-            r->r.push_back(make_pair(type, tok));
+            if (wasSym) // symbol -> rule.right-hand
+                { rule.r.push_back(make_pair(TType::symbol, lastSym)); }
+            wasSym = false;
+            rule.r.push_back(make_pair(type, tok)); // memo term
             break;
 
         case TType::assign:
-            // write rule
-            if (r != nullptr) {
-                grammar.push_back(*r);
+            if (wasSym) { // rule -> grammar
+                grammar.push_back(rule);
+                rule = _rule(lastSym);
             }
-            // set new rule with symbol temp
-            r = new _rule(s_temp->second);
-            delete s_temp;
-            s_temp = nullptr;
+            else {
+                MSG_EXIT("bnf : invalid left-hand");
+            }            
+            wasSym = false;
             break;
-            
+
         case TType::op_or:
-            // write symbol temp
-            if (s_temp != nullptr) {
-                r->r.push_back(*s_temp);
-                s_temp = nullptr;
-            }
-            // write rule
-            r_temp = new _rule(r->l);
-            grammar.push_back(*r);
-            // set new rule
-            r = r_temp;
-            r_temp = nullptr;
+            if (wasSym) // symbol -> rule.right-hand
+                { rule.r.push_back(make_pair(TType::symbol, lastSym)); }
+            wasSym = false;
+            grammar.push_back(rule);    // rule -> grammar
+            rule = _rule(rule.l);             // reuse rule.left-hand
             break;
 
         case TType::error:
         default:
-            MSG_EXIT("bToG : error type");
+            MSG_EXIT("bnf : error token type");
         }
     }
-    if (s_temp != nullptr) {
-        r->r.push_back(*s_temp);        
-    }
-    grammar.push_back(*r);
+    if (wasSym) // symbol -> rule.right-hand
+        { rule.r.push_back(make_pair(TType::symbol, lastSym)); }
+    grammar.push_back(rule);
 
 
     // make symbol map
-    string str = g[0].l;
+    string str = grammar[0].l;
     int begin = 0;
     int i = 1;
-    for ( ; i < g.size(); i++) {
-        if (g[i].l != str) {
+    for ( ; i < grammar.size(); i++) {
+        if (grammar[i].l != str) {
             symmap[str] = make_pair(begin, i);
-            str = g[i].l;
+            str = grammar[i].l;
             begin = i;
         }
     }
     symmap[str] = make_pair(begin, i);
 
+
     // make term list
-    for (auto rule : g) {
+    for (auto rule : grammar) {
         for (auto p : rule.r) {
             if (p.first == TType::term) {
                 termset.insert(p.second);
@@ -152,13 +154,15 @@ _BNFParser::_BNFParser(ifstream& fbnf) {
         }
     }
 
+
     // make nullable list
-    for (auto rule : g) {
+    for (auto rule : grammar) {
         if (rule.r[0].second == EPSILON) {
             nullable.insert(rule.l);
         }
     }
 }
+
 bool _BNFParser::isNullable(string symbol) {
     return nullable.find(symbol) != nullable.end();
 }

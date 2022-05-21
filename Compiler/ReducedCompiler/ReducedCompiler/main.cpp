@@ -10,9 +10,9 @@ int main() {
     }
 
     _BNFParser bnfParser(fbnf);
-    grammar g = bnfParser.getGrammar();
-    auto sm = bnfParser.getSymmap();
-    auto ts = bnfParser.getTermset();
+    grammar g = bnfParser.grammar;
+    auto sm = bnfParser.symmap;
+    auto ts = bnfParser.termset;
 
     cout << "grammar" << endl;
     int count = 0;

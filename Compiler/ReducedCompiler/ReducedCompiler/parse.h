@@ -25,11 +25,18 @@ Parser
 **************************************************/
 class LR1Parser {
 public:
-	struct ruleIdx {
-		
+	struct rIndex {
+		int rule;	// rule number
+		int init;	// at initial item
+		set<string> look;	// lookahead
 	};
-	class LR1State {
+	struct sData {
+		set<struct rIndex> k; // kernel item
+		set<struct rIndex> c; // closure item
+	};
+	class LR1State : public FiniteState<sData, string, int, LR1State>  {
 	public:
+		bool equals(LR1State* s);
 	private:
 	};
 
