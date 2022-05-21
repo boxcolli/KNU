@@ -3,6 +3,7 @@
 
 #include "globals.h"
 #include "bnf.h"
+#include "state.h"
 
 /**************************************************
 First Follow
@@ -10,6 +11,7 @@ First Follow
 class FirstFollow {
 public:
 	FirstFollow(ifstream& fbnf);
+
 private:
 	_BNFParser bnfP;
 	map<string, set<string>> firsts;
@@ -23,9 +25,19 @@ Parser
 **************************************************/
 class LR1Parser {
 public:
+	struct ruleIdx {
+		
+	};
+	class LR1State {
+	public:
+	private:
+	};
+
 	LR1Parser();
+
+
 private:
-	_BNFParser bnfP;
+	_BNFParser& bnfP;
 };
 
 #endif

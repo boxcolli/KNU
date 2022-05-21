@@ -10,9 +10,10 @@
 #include <set>
 using namespace std;
 
-// BNF
+// Parser
 #define EPSILON "EMPTY"         // nullable terminal
-#define S_SYMBOL "<program>"    // starting symbol
+#define START_SYM "<program>"   // starting symbol
+#define END_SYM "$"             // end/last/bottom symbol
 
 void MSG_EXIT(string msg);
 
