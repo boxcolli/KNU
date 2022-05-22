@@ -1,2 +1,5 @@
-<program> ::= <declaration-list>
-<declaration-list> ::= <declaration-list> <declaration> | <declaration>
+<statement> ::= <if-stmt>
+<statement> ::= OTHER
+<if-stmt> ::= IF LPAREN <exp> RPAREN <statement> <else-part>
+<else-part> ::= ELSE <statement> | EMPTY
+<exp> ::= ZERO | ONE

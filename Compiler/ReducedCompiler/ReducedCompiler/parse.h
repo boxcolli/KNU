@@ -11,12 +11,13 @@ First Follow
 class FirstFollow {
 public:
 	FirstFollow(ifstream& fbnf);
+	map<string, set<string>> firsts;
+	map<string, set<string>> follows;
 
 private:
 	_BNFParser bnfP;
-	map<string, set<string>> firsts;
-	map<string, set<string>> follows;
-	
+	void kahn(map<string, set<string>> &data, map<string, set<string>> &adj, map<string, int> &ind);
+	void kahn_w_cycle(map<string, set<string>> &data, map<string, set<string>> &adj, map<string, int> &ind);
 	void makeFirsts();
 	void makeFollows();
 };
@@ -29,10 +30,13 @@ public:
 		int rule;	// rule number
 		int init;	// at initial item
 		set<string> look;	// lookahead
+		bool operator == (const rIndex& r) const {
+			return this->rule == r.rule && this->init == r.init;
+		}
 	};
 	struct sData {
-		set<struct rIndex> k; // kernel item
-		set<struct rIndex> c; // closure item
+		set<rIndex> k; // kernel item
+		set<rIndex> c; // closure item
 	};
 	class LR1State : public FiniteState<sData, string, int, LR1State>  {
 	public:

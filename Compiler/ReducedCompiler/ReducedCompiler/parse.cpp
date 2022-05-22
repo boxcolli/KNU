@@ -6,6 +6,45 @@
 /**************************************************
 First Follow
 **************************************************/
+void kahn(map<string, set<string>> &data, map<string, set<string>> &adj, map<string, int> &ind) {
+    // kahn algorithm
+    //      from independent symbol (in-degree==0)
+    //      to dependent symbol
+    while (true) {
+        // find 0 in-degree
+        string zero = "";
+        for (auto keyval : ind) {
+            if (keyval.second==0) {
+                zero = keyval.first;
+                break;
+            }
+        }
+        if (zero=="") { break; }    // done
+
+        ind.erase(zero);
+
+        // add firsts
+        for (auto lhand : adj[zero]) {
+            ind[lhand] -= 1; // in-degree--
+            for (auto d : data[zero]) {
+                data[lhand].insert(d);
+            }
+        }
+    }
+}
+void kahn_w_cycle(map<string, set<string>> &data, map<string, set<string>> &adj, map<string, int> &ind) {
+    // simplify graph
+    kahn(data, adj, ind);
+
+    // init
+    map<string, set<string>> bind;
+    for (auto keyval : ind) {
+        bind[keyval.first] = set<string>();
+    }
+
+    
+}
+
 FirstFollow::FirstFollow(ifstream& fbnf) : bnfP(_BNFParser(fbnf)) {
     makeFirsts();
     makeFollows();
@@ -23,22 +62,24 @@ void FirstFollow::makeFirsts() {
     }
     // construct graph
     for (auto rule : bnfP.grammar) {
-        for (auto tok : rule.r){
+        for (auto rhand : rule.r){
             // term
-            if (tok.first==TType::term) {
+            if (rhand.first==TType::term) {
                 // epsilon rule?
-                if (tok.second==EPSILON) {
+                if (rhand.second==EPSILON) {
                     // do nothing
                 }
                 else {
-                    firsts[rule.l].insert(tok.second);  // add firsts
+                    firsts[rule.l].insert(rhand.second);  // add firsts
                 }
             }
             // symbol
-            else {               
-                
-                adj[tok.second].insert(rule.l);     // graph : lhand <- symbol
-                ind[rule.l] += 1;                   // in-degree for lhand
+            else {
+                if (rhand.second != rule.l  // ignore recursion
+                    && adj[rhand.second].find(rule.l) == adj[rhand.second].end()) {
+                    adj[rhand.second].insert(rule.l);   // graph : lhand <- symbol
+                    ind[rule.l] += 1;                       // in-degree for lhand
+                }                
                 if (bnfP.isNullable(rule.l)) {      // nullable?
                     continue;
                 }
@@ -53,9 +94,9 @@ void FirstFollow::makeFirsts() {
     while (true) {
         // find 0 in-degree
         string zero = "";
-        for (auto keyValue : ind) {
-            if (keyValue.second==0) {
-                zero = keyValue.first;
+        for (auto keyval : ind) {
+            if (keyval.second==0) {
+                zero = keyval.first;
                 break;
             }
         }
@@ -110,17 +151,37 @@ void FirstFollow::makeFollows() {
         }
 
         // follow(lhand) -> follow(last-symbol)
-        for (auto it = rule.r.rbegin();
-            it != rule.r.rend(); it++) {
+        for (auto it = rule.r.rbegin(); it != rule.r.rend(); it++) {
             if (it->first==TType::symbol) {
-                adj[rule.l].insert(it->second);
-                ind[it->second] += 1;
+                // only if symbol
+                if (rule.l != it->second    // ignore recursion
+                    && adj[rule.l].find(it->second) == adj[rule.l].end()) {                    
+                    adj[rule.l].insert(it->second);
+                    ind[it->second] += 1;
+                }                
                 if (bnfP.isNullable(it->second))
                     { continue; }
             }
             break;
         }
     }
+
+    cout << "follow_adj:" << endl;
+    for (auto keyval : adj) {
+        cout << keyval.first << ":";
+        for (auto v : keyval.second) {
+            cout << " " << v;
+        }
+        cout << endl;
+    }
+    cout << endl;
+
+    cout << "follow_ind:" << endl;
+    for (auto keyval : ind) {
+	    cout << keyval.first << " : " << keyval.second << endl;
+    }
+    cout << endl;
+
 
     // kahn algorithm : add follows
     //      from independent symbol (in-degree==0)
@@ -137,6 +198,7 @@ void FirstFollow::makeFollows() {
         if (zero=="") { break; }    // done
 
         ind.erase(zero);
+        cout << "follow..." << zero << endl;
 
         // add firsts
         for (auto lhand : adj[zero]) {

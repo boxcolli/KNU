@@ -1,0 +1,12 @@
+first------------------------------
+<else-part>: ELSE
+<exp>: ONE ZERO
+<if-stmt>: IF
+<statement>: IF OTHER
+
+follow------------------------------
+<else-part>:
+<exp>: RPAREN
+<if-stmt>:
+<program>: $
+<statement>: ELSE

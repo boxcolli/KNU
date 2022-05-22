@@ -4,38 +4,33 @@
 #include "parse.h"
 
 int main() {
-    ifstream fbnf("resources/bnf.txt");
+    ifstream fbnf("resources/bnf_test.txt");
     if (fbnf.is_open()) {
         cout << "open" << endl;
     }
 
-    _BNFParser bnfParser(fbnf);
-    grammar g = bnfParser.grammar;
-    auto sm = bnfParser.symmap;
-    auto ts = bnfParser.termset;
+    ofstream fout("resources/fout.txt");
 
-    cout << "grammar" << endl;
-    int count = 0;
-    for (auto rule : g) {
-        cout << rule.l << "[" << count++ << "] :";
-        for (auto tok : rule.r) {
-            cout << " " << tok.second;
-        }
-        cout << endl;
-    }
-    cout << "\n\n\n";
-
-    cout << "symbol map" << endl;
-    for (auto const& keyValue : sm) {
-        cout << keyValue.first << " : "
-            << keyValue.second.first << " "
-            << keyValue.second.second << endl;
-    }
-    cout << "\n\n\n";
-    cout << "term set" << endl;
-    for (auto item : ts) {
-        cout << item << endl;
-    }
+    FirstFollow ff(fbnf);
     
+    fout << "first------------------------------" << endl;
+    for (auto keyval : ff.firsts) {
+        fout << keyval.first << ":";
+        for (string s : keyval.second) {
+            fout << " " << s;
+        }
+        fout << endl;
+    }
+    fout << endl;
+    
+    fout << "follow------------------------------" << endl;
+    for (auto keyval : ff.follows) {
+        fout << keyval.first << ":";
+        for (string s : keyval.second) {
+            fout << " " << s;
+        }
+        fout << endl;
+    }
+
     return 0;
 }
