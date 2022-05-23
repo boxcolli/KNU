@@ -13,6 +13,8 @@
         "xstddef": "cpp",
         "iosfwd": "cpp",
         "fstream": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "xutility": "cpp",
+        "PARSE.C": "cpp"
     }
 }

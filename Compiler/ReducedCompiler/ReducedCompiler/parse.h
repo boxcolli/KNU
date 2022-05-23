@@ -2,53 +2,87 @@
 #define _PARSE_H_
 
 #include "globals.h"
-#include "bnf.h"
-#include "state.h"
+#include "scan.h"
 
 /**************************************************
-First Follow
+Data
 **************************************************/
-class FirstFollow {
-public:
-	FirstFollow(ifstream& fbnf);
-	map<string, set<string>> firsts;
-	map<string, set<string>> follows;
 
-private:
-	_BNFParser bnfP;
-	void kahn(map<string, set<string>> &data, map<string, set<string>> &adj, map<string, int> &ind);
-	void kahn_w_cycle(map<string, set<string>> &data, map<string, set<string>> &adj, map<string, int> &ind);
-	void makeFirsts();
-	void makeFollows();
+enum class NodeKind {
+    VarDecl, FunDecl,
+    ParamList, Param,
+    Stmt,
+    LocalDecls, StmtList,
+    Expr,
 };
+enum class DeclKind { VarK, FunK } ;
+typedef enum {VoidK, ListK} ParamKind;
+typedef enum {ExpK, CompK, SelecK, IterK, RetK} StmtKind;
+typedef enum {AsgnK, OpK,ConstK,IdK} ExpKind;
+
+/* ExpType is used for type checking */
+typedef enum {Void,Integer,Boolean} ExpType;
+
+typedef struct treeNode {
+    vector<treeNode*> child;
+    treeNode* sibling;
+    int lineno;
+    NodeKind nodekind;
+    union {
+        DeclKind decl;
+        StmtKind stmt;
+        ExpKind exp; } kind;
+    union { TokenType op;
+            int val;
+            char * name; } attr;
+    ExpType type; /* for type checking of exps */
+} TreeNode;
+
 /**************************************************
 Parser
 **************************************************/
-class LR1Parser {
+class RDParser {
 public:
-	struct rIndex {
-		int rule;	// rule number
-		int init;	// at initial item
-		set<string> look;	// lookahead
-		bool operator == (const rIndex& r) const {
-			return this->rule == r.rule && this->init == r.init;
-		}
-	};
-	struct sData {
-		set<rIndex> k; // kernel item
-		set<rIndex> c; // closure item
-	};
-	class LR1State : public FiniteState<sData, string, int, LR1State>  {
-	public:
-		bool equals(LR1State* s);
-	private:
-	};
-
-	LR1Parser();
-
-
+    RDParser(ifstream& fcode);
+    TreeNode* getTree() { return root; }
 private:
-	_BNFParser& bnfP;
+    TreeNode* root;
+    Scanner scanner;
+    TokenType token;    
+
+    void syntaxError(string message);
+    void match(TokenType expected);    
+    TokenType getToken();
+    TreeNode* newNode(NodeKind nodeKind);
+    /*************************************************/
+    TreeNode* declaration_list();
+    TreeNode* declaration();
+    TreeNode* var_declaration();
+    TreeNode* type_specifier();
+    TreeNode* fun_declaration();
+    TreeNode* params();
+    TreeNode* param_list();
+    TreeNode* param();
+    TreeNode* compound_stmt();
+    TreeNode* local_declaration();
+    TreeNode* statement_list();
+    TreeNode* statement();
+    TreeNode* expression_stmt();
+    TreeNode* selection_stmt();
+    TreeNode* iteration_stmt();
+    TreeNode* return_stmt();
+    TreeNode* expression();
+    TreeNode* var();
+    TreeNode* simple_expression();
+    TreeNode* relop();
+    TreeNode* additive_expression();
+    TreeNode* addop();
+    TreeNode* term();
+    TreeNode* mulop();
+    TreeNode* factor();
+    TreeNode* call();
+    TreeNode* args();
+    TreeNode* arg_list();
 };
 
 #endif

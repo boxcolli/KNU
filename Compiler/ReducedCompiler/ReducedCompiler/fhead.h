@@ -9,7 +9,7 @@ File read helper
 
 class FileHeader {
 private:
-	ifstream* fin;
+	ifstream& fin;
 	string buffer;
 	size_t length;
 	int cursor;
@@ -18,8 +18,8 @@ private:
 	bool putBackFlag = false;
 
 public:
-	FileHeader(ifstream* fin) : fin(fin) {
-		getline(*fin, buffer);
+	FileHeader(ifstream& fin) : fin(fin) {
+		getline(fin, buffer);
 		length = buffer.length();
 		cursor = 0;
 	}
@@ -34,10 +34,10 @@ public:
 		// buffer empty?
 		if (cursor == length) {
 			buffer = "";
-			getline(*fin, buffer);
+			getline(fin, buffer);
 
 			// EOF?
-			if (buffer == "" && fin->eof()) {
+			if (buffer == "" && fin.eof()) {
 				return EOF;
 			}
 

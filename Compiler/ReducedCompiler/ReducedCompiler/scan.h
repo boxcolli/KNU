@@ -32,7 +32,7 @@ enum class TokenType {
 	tELSE, tIF, tINT, tRETURN, tVOID, tWHILE,
 	tID, tNUM,
 	tADD, tSUB, tMUL, tDIV, tLT, tLTE, tGT, tGTE, tEQ, tNEQ,
-	tASSIGN, tENDS, tCOMMA,
+	tASSIGN, tSEMI, tCOMMA,
 	tLP, tRP, tLSB, tRSB, tLCB, tRCB,
 	tCOMMENT
 };
@@ -51,7 +51,7 @@ Scanner
 **************************************************/
 class Scanner {
 public:
-	Scanner(ifstream* f);
+	Scanner(ifstream& f);
 
 	TokenType processChar();
 	TokenType processToken();
@@ -75,7 +75,7 @@ private:
 		fID, fNUM,
 		fADD, fSUB, fMUL, fDIV,
 		fLT, fLTE, fGT, fGTE, fEQ, fNEQ,
-		fASSIGN, fENDS, fCOMMA,
+		fASSIGN, fSEMI, fCOMMA,
 		fLP, fRP, fLSB, fRSB, fLCB, fRCB,
 		fCOMMENT
 	};

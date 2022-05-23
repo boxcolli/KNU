@@ -4,7 +4,7 @@
 #include "parse.h"
 
 int main() {
-    ifstream fbnf("resources/bnf_test.txt");
+    ifstream fbnf("resources/bnf.txt");
     if (fbnf.is_open()) {
         cout << "open" << endl;
     }

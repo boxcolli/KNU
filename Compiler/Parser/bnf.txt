@@ -7,14 +7,14 @@ fun-declaration -> type-specifier ID ( params ) compound-stmt
 params -> param-list | void
 param-list -> param-list, param | param
 param -> type-specifier ID | type-specifier ID [ ]
-compound-stmt -> { locaUdeclarations statement-list }
+compound-stmt -> { local-declarations statement-list }
 local-declarations -> local-declarations var-declaration | empty
 statement-list -> statement-list statement | empty
-statement -> expression-stmt | compound-stmt | selection-stmt | ieration-stmt | return-stmt
-expession-stmt -> expression ; | ;
+statement -> expression-stmt | compound-stmt | selection-stmt | iteration-stmt | return-stmt
+expression-stmt -> expression ; | ;
 selection-stmt -> if ( expression ) statement | if ( expression ) statement else statement
 iteration-stmt -> while ( expression ) statement
-retum-stmt -> return ; | return expression ;
+return-stmt -> return ; | return expression ;
 expression -> var = expression | simple-expression
 var -> ID | ID [ expression ]
 simple-expression -> additive-expression relop additive-expression | additive-expression

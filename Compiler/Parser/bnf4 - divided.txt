@@ -1,29 +1,50 @@
-<program> ::= <declaration-list>
-<declaration-list> ::= <declaration-list> <declaration> | <declaration>
-<declaration> ::= <var-declaration> | <fun-declaration>
-<var-declaration> ::= <type-specifier> ID SEMI | <type-specifier> ID LSBRACK NUM RSBRACK ;
-<type-specifier> ::= INT | VOID
-<fun-declaration> ::= <type-specifier> ID LPAREN <params> RPAREN <compound-stmt>
-<params> ::= <param-list> | VOID
-<param-list> ::= <param-list> COMMA <param> | <param>
-<param> ::= <type-specifier> ID | <type-specifier> ID LSBRACK RSBRACK
-<compound-stmt> ::= LCBRACK <locaUdeclarations> <statement-list> RCBRACK
-<local-declarations> ::= <local-declarations> <var-declaration> | EMPTY
-<statement-list> ::= <statement-list> <statement> | EMPTY
-<statement> ::= <expression-stmt> | <compound-stmt> | <selection-stmt> | <ieration-stmt> | <return-stmt>
-<expession-stmt> ::= <expression> SEMI | SEMI
-<selection-stmt> ::= IF LPAREN <expression> RPAREN <statement> | IF LPAREN <expression> RPAREN <statement> <else> <statement>
-<iteration-stmt> ::= WHILE LPAREN <expression> RPAREN <statement>
-<retum-stmt> ::= RETURN SEMI | RETURN <expression> SEMI
-<expression> ::= <var> EQ <expression> | <simple-expression>
-<var> ::= ID | ID LSBRACK <expression> RSBRACK
-<simple-expression> ::= <additive-expression> <relop> <additive-expression> | <additive-expression>
-<relop> ::= LTE | LT | GT | GTE | ASSIGN | NEQ
-<additive-expression> ::= <additive-expression> <addop> <term> | <term>
-<addop> ::= ADD | SUB
-<term> ::= <term> <mulop> <factor> | <factor>
-<mulop> ::= MUL | DIV
-<factor> ::= LPAREN <expression> RPAREN | <var> | <call> | NUM
-<call> ::= ID LPAREN <args> RPAREN
-<args> ::= <arg-list> | EMPTY
-<arg-list> ::= <arg-list> COMMA <expression> | <expression>
+<program>				::= <declaration-list>
+<declaration-list>	::= <declaration> { <declaration> }
+<declaration>			::= <var-declaration>
+								| <fun-declaration>
+<var-declaration>	::= <type-specifier> ID SEMI
+								| <type-specifier> ID LSBRACK NUM RSBRACK SEMI
+<type-specifier>		::= INT
+								| VOID
+<fun-declaration>	::= <type-specifier> ID LPAREN <params> RPAREN <compound-stmt>
+<params>					::= <param-list>
+								| VOID
+<param-list>			::= <param> { COMMA <param> }
+<param>					::= <type-specifier> ID [ LSBRACK RSBRACK ]
+<compound-stmt>		::= LCBRACK <local-declarations> <statement-list> RCBRACK
+<local-declarations>::= <var-declaration> { <var-declaration> }
+								| EMPTY
+<statement-list>		::= <statement> { <statement> }
+								| EMPTY
+<statement>				::= <expression-stmt>
+								| <compound-stmt>
+								| <selection-stmt>
+								| <iteration-stmt>
+								| <return-stmt>
+<expression-stmt>	::= [ <expression> ] SEMI
+<selection-stmt>		::= IF LPAREN <expression> RPAREN <statement> [ ELSE <statement> ]
+<iteration-stmt>		::= WHILE LPAREN <expression> RPAREN <statement>
+<return-stmt>			::= RETURN [ <expression> ] SEMI
+<expression>			::= <var> ASSIGN <expression>
+								| <simple-expression>
+<var>						::= ID [ LSBRACK <expression> RSBRACK ]
+<simple-expression>	::= <additive-expression> [ <relop> <additive-expression> ]
+<relop>					::= LTE
+								| LT
+								| GT
+								| GTE
+								| EQ
+								| NEQ
+<additive-expression>	::= <term> { <addop> <term> }
+<addop>					::= ADD | SUB
+<term>					::= <factor> { <mulop> <factor> }
+<mulop>					::= MUL
+								| DIV
+<factor>					::= LPAREN <expression> RPAREN
+								| <var>
+								| <call>
+								| NUM
+<call>					::= ID LPAREN <args> RPAREN
+<args>					::= <arg-list>
+								| EMPTY
+<arg-list>				::= <expression> { COMMA <expression> }

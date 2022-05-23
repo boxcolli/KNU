@@ -27,7 +27,7 @@ enum class TransitionOpt {
 /******************************
 Scanner::Public
 ******************************/
-Scanner::Scanner(ifstream* f) :
+Scanner::Scanner(ifstream& f) :
     fileHeader(FileHeader(f)),
     tokenBuffer(""),
     flushFlag(false),
@@ -163,7 +163,7 @@ void Scanner::buildState() {
 	addState("GT_GTE");
 	addState("EQ_ASSIGN");
 	addState("NEQ");
-	addState("ENDS", StateData::fENDS);
+	addState("SEMI", StateData::fSEMI);
 	addState("COMMA", StateData::fCOMMA);
 	addState("LP", StateData::fLP);
 	addState("RP", StateData::fRP);
@@ -185,7 +185,7 @@ void Scanner::buildInit() {
     mapState("init", "GT_GTE", ">");
     mapState("init", "EQ_ASSIGN", "=");
     mapState("init", "NEQ", "!");
-    mapState("init", "ENDS", ";");
+    mapState("init", "SEMI", ";");
     mapState("init", "COMMA", ",");
     mapState("init", "LP", "(");
     mapState("init", "RP", ")");
@@ -313,7 +313,7 @@ TokenType Scanner::stateToToken(StateData stateData) {
     case StateData::fEQ:		return TokenType::tEQ;
     case StateData::fNEQ:		return TokenType::tNEQ;
     case StateData::fASSIGN:	return TokenType::tASSIGN;
-    case StateData::fENDS:		return TokenType::tENDS;
+    case StateData::fSEMI:		return TokenType::tSEMI;
     case StateData::fCOMMA:		return TokenType::tCOMMA;
     case StateData::fLP:		return TokenType::tLP;
     case StateData::fRP:		return TokenType::tRP;
