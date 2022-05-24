@@ -367,16 +367,36 @@ TreeNode* RDParser::expression() {
     return t;
 }
 TreeNode* RDParser::additive_expression() {
+    // <term> { <addop> <term> }
     TreeNode* t = term();
-    TreeNode* p = nullptr;
-    TreeNode* q = nullptr;
+    TreeNode* p = t; // previous <addop>
+    TreeNode* q = nullptr; // new <addop>
+    TreeNode* r = nullptr; // previous <term>
+    bool firstOper = true;
     while((token==TokenType::tADD)
-        ||(token==TokenType::tADD)) {
+        ||(token==TokenType::tSUB)) {
+        q = new TreeNode(NodeKind::Addop, lineno);
         switch (token) {
         case TokenType::tADD:
+            q->oper.oper = OperKind::ADD;
+            break;
         case TokenType::tSUB:
+        default:
+            q->oper.oper = OperKind::SUB;
+            break;
         }
+        //q->child.push_back(p);
+        if (firstOper) {
+            firstOper = false;
+            t = q;
+        }
+        else {
+
+        }
+        
     }
+    p->child.push_back(r);
+    return t;
     
 }
 
