@@ -14,8 +14,8 @@ enum class NodeKind {
     LocDecl, StmtList,
     Stmt, ExprStmt, CmpdStmt, SlctStmt, IterStmt, RetStmt,
     Expr,
-    Assign, Relop, Addop, Mulop,
-    Term, Factor, Call,
+    Oper, Assign, Relop, Addop, Mulop,
+    Factor, Call,
     Var, Type, Ary, Args, Num,
     ERROR
 };
@@ -56,11 +56,6 @@ struct OperAttr { OperAttr() : type(TypeKind::Null) {}
     OperKind    oper;
     ErrKind     err     = ErrKind::Null;
 };
-struct TermAttr { TermAttr() : type(TypeKind::Null), val(0) {}
-    TypeKind    type;
-    int         val;
-    ErrKind     err     = ErrKind::Null;
-};
 struct FactAttr { FactAttr() : type(TypeKind::Null), val(0) {}
     TypeKind    type;
     int         val;
@@ -99,7 +94,6 @@ struct TreeNode {
         StmtAttr stmt;
         ExprAttr expr;
         OperAttr oper;
-        TermAttr term;
         FactAttr fact;
         CallAttr call;
         VarAttr var;
@@ -147,9 +141,12 @@ private:
     TreeNode* iteration_stmt();//todo
     TreeNode* return_stmt();//todo
     TreeNode* expression();
-    TreeNode* relop();
-    TreeNode* additive_expression();
+    TreeNode* additive_expression();//WIP
     
+    TreeNode* term();
+    TreeNode* factor();
+    TreeNode* var();
+    TreeNode* call();
     TreeNode* type_specifier();
     TreeNode* args();//todo
     TreeNode* num();

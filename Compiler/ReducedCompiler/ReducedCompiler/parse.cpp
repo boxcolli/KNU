@@ -18,11 +18,11 @@ TreeNode::TreeNode(NodeKind nodeKind, int lineno) {
     case NodeKind::IterStmt:
     case NodeKind::RetStmt:     stmt=StmtAttr(); break;
     case NodeKind::Expr:        expr=ExprAttr(); break;
-    case NodeKind::Assign:        
+    case NodeKind::Oper:
+    case NodeKind::Assign:
     case NodeKind::Relop:
     case NodeKind::Addop:
     case NodeKind::Mulop:       oper=OperAttr(); break;
-    case NodeKind::Term:        term=TermAttr(); break;
     case NodeKind::Factor:      fact=FactAttr(); break;
     case NodeKind::Call:        call=CallAttr(); break;
     case NodeKind::Var:         var=VarAttr(); break;
@@ -39,23 +39,27 @@ RDParser::RDParser(ifstream& fcode) : root(nullptr), scanner(Scanner(fcode)) {
     nextToken();
     root = declaration_list();
 }
+
 void RDParser::syntaxError(string message) {
     cout << "\n>>>";
     cout << "Syntax error at line " << lineno << ": " << message;
     cout << "(was: " << tokenString << ")" << endl;
     error = true;
 }
+
 void RDParser::match(TokenType expected) {
     if (token == expected) nextToken();
     else {
         syntaxError("unexpected token -> ");
     }
 }
+
 void RDParser::nextToken() {
     token = scanner.processToken();
     lineno = scanner.getLineno();
     tokenString = scanner.getToken();
 }
+
 /*************************************************/
 
 TreeNode* RDParser::declaration_list() {
@@ -166,6 +170,7 @@ TreeNode* RDParser::params() {
     }
     return t;
 }
+
 TreeNode* RDParser::compound_stmt() {
     TreeNode* t = new TreeNode(NodeKind::CmpdStmt, lineno);
     match(TokenType::tLCB);
@@ -173,6 +178,7 @@ TreeNode* RDParser::compound_stmt() {
     t->child.push_back(statement_list());
     //TODO
 }
+
 TreeNode* RDParser::local_declarations() {
     TreeNode* t = new TreeNode(NodeKind::LocDecl, lineno);
     if ((token==TokenType::tINT)
@@ -220,6 +226,7 @@ TreeNode* RDParser::local_declarations() {
     else { t->ldecl.empty=true; }
     return t;
 }
+
 TreeNode* RDParser::statement_list() {
     TreeNode* t = new TreeNode(NodeKind::StmtList, lineno);
     if ((token==TokenType::tID)
@@ -248,6 +255,7 @@ TreeNode* RDParser::statement_list() {
     else { t->slist.empty=true; }
     return t;
 }
+
 TreeNode* RDParser::statement() {
     TreeNode* t;
     switch (token) {
@@ -264,6 +272,7 @@ TreeNode* RDParser::statement() {
     }
     return t;
 }
+
 TreeNode* RDParser::expression_stmt() {
     TreeNode* t = new TreeNode(NodeKind::ExprStmt, lineno);
     if (token==TokenType::tSEMI) {        
@@ -273,114 +282,172 @@ TreeNode* RDParser::expression_stmt() {
     match(TokenType::tSEMI);
     return t;
 }
+
 TreeNode* RDParser::expression() {    
     TreeNode* t = new TreeNode(NodeKind::Expr, lineno);
+    TreeNode* p = factor();
+    TreeNode* q = nullptr;
+    switch (p->nodeKind) {
+    case NodeKind::Factor: // LP <expression> RP
+        break;
+    case NodeKind::Var: // operation        
+        if (token==TokenType::tASSIGN) {
+            match(TokenType::tASSIGN);
+            q = new TreeNode(NodeKind::Assign, lineno);
+            q->child.push_back(p);
+            q->child.push_back(expression());
+            t->child.push_back(q);
+            break;
+        }            
+        // continue;
+    case NodeKind::Num: // [ <relop> <additive-expression> ]
+        if ((token==TokenType::tLTE)
+            ||(token==TokenType::tLT)
+            ||(token==TokenType::tGT)
+            ||(token==TokenType::tGTE)
+            ||(token==TokenType::tEQ)
+            ||(token==TokenType::tNEQ)
+            ||(token==TokenType::tADD)
+            ||(token==TokenType::tSUB)
+            ||(token==TokenType::tMUL)
+            ||(token==TokenType::tDIV)) {
+            q = new TreeNode(NodeKind::Oper, lineno);
+            q->child.push_back(p);
+            switch(token) {
+            case TokenType::tLTE:                
+                q->oper.oper = OperKind::LTE;                
+                q->child.push_back(additive_expression());
+                break;
+            case TokenType::tLT:
+                q->oper.oper = OperKind::LT;
+                q->child.push_back(additive_expression());
+                break;
+            case TokenType::tGT:
+                q->oper.oper = OperKind::GT;
+                q->child.push_back(additive_expression());
+                break;
+            case TokenType::tGTE:
+                q->oper.oper = OperKind::GTE;
+                q->child.push_back(additive_expression());
+                break;
+            case TokenType::tEQ:
+                q->oper.oper = OperKind::EQ;
+                q->child.push_back(additive_expression());
+                break;
+            case TokenType::tNEQ:
+                q->oper.oper = OperKind::NEQ;
+                q->child.push_back(additive_expression());
+                break;
+            case TokenType::tADD:
+                q->oper.oper = OperKind::ADD;
+                q->child.push_back(term());
+                break;
+            case TokenType::tSUB:
+                q->oper.oper = OperKind::SUB;
+                q->child.push_back(term());
+                break;
+            case TokenType::tMUL:
+                q->oper.oper = OperKind::MUL;
+                q->child.push_back(factor());
+                break;
+            case TokenType::tDIV:
+            default:
+                q->oper.oper = OperKind::DIV;
+                q->child.push_back(factor());
+                break;
+            }
+            nextToken();
+            t->child.push_back(q);
+        }
+        else { // no operation
+            t->child.push_back(p);
+        }
+        break;
+    }
+    return t;
+}
+TreeNode* RDParser::additive_expression() {
+    TreeNode* t = term();
     TreeNode* p = nullptr;
     TreeNode* q = nullptr;
+    while((token==TokenType::tADD)
+        ||(token==TokenType::tADD)) {
+        switch (token) {
+        case TokenType::tADD:
+        case TokenType::tSUB:
+        }
+    }
+    
+}
+
+TreeNode* RDParser::term() {
+    TreeNode* t = factor();
+    TreeNode* p = t;
+    TreeNode* q = nullptr;
+    bool firstMulop = true;
+    // <factor> { <mulop> <factor> }
+    while((token==TokenType::tMUL)
+        ||(token==TokenType::tDIV)) {
+        q = new TreeNode(NodeKind::Mulop, lineno);                
+        if(token==TokenType::tMUL) {
+            q->oper.oper = OperKind::MUL;
+        } else { q->oper.oper = OperKind::DIV; }
+        q->child.push_back(p);
+        p = factor();
+        q->child.push_back(p);
+        if(firstMulop) {
+            firstMulop=false;
+            t=q;
+        }
+    }
+    return t;    
+}
+
+TreeNode* RDParser::factor() {
+    TreeNode* t = nullptr;
+    TreeNode* p = nullptr;
     string id;
     switch (token) {
+    case TokenType::tLP: // LP <expression> RP
+        match(TokenType::tLP);
+        t = expression();
+        match(TokenType::tRP);
+        break;
     case TokenType::tID: // <var> | <call>
-        // <var> [ ASSIGN <expression> ] | <call>
         id = tokenString;
         nextToken();
         switch (token) {
-        case TokenType::tLSB: // <var> [ LSB <expression> RSB ]
-            p = new TreeNode(NodeKind::Var, lineno);
-            p->var.id=id;
+        case TokenType::tLSB: // <var> ::= ID [ LSB <expression> RSB ]
+            t = new TreeNode(NodeKind::Var, lineno);
+            t->var.id=id;
             match(TokenType::tLSB);
-            p->child.push_back(expression());
+            t->child.push_back(expression());
             match(TokenType::tRSB);
             break;
-        case TokenType::tASSIGN: // <var> [ ASSIGN <expression> ]
-            p = new TreeNode(NodeKind::Assign, lineno);
-            q = new TreeNode(NodeKind::Var, lineno);
-            q->var.id=id;
-            p->child.push_back(q);
-            p->child.push_back(expression());            
-            break;
         case TokenType::tLP: // <call> ::= ID LP <args> RP
-            p = new TreeNode(NodeKind::Call, lineno);
-            p->call.id=id;
+            t = new TreeNode(NodeKind::Call, lineno);
+            t->call.id=id;
             match(TokenType::tLP);
-            p->child.push_back(args());
+            t->child.push_back(args());
             match(TokenType::tRP);
             break;
-        default: // <var> OP?
-            p = new TreeNode(NodeKind::Var, lineno);
-            p->var.id=id;
-            switch (token) {
-            case TokenType::tLTE:
-            case TokenType::tLT:
-            case TokenType::tGT:
-            case TokenType::tGTE:
-            case TokenType::tEQ:
-            case TokenType::tNEQ:
-                q = p;
-                p = relop();
-                p->child.insert(q->child.begin(), q);
-                break;
-            case TokenType::tADD:
-            case TokenType::tSUB:
-                q = p;
-                p = addop();
-                p->child.insert(q->child.begin(), q);
-                break;
-            case TokenType::tMUL:
-            case TokenType::tDIV:
-                q = p;
-                p = mulop();
-                p->child.insert(q->child.begin(), q);
-                break;
-            default: // <var> only
-                break;
-            }
+        default: // <var> ::= ID
+            t = new TreeNode(NodeKind::Var, lineno);
+            t->var.id=id;
             break;
         }
-        t->child.push_back(p);
-        break;
-    case TokenType::tLP: // <factor> ::= LP <expression> RP
-        match(TokenType::tLP);
-        t->child.push_back(expression());
-        match(TokenType::tRP);
         break;
     case TokenType::tNUM: // <factor> ::= NUM
         t->child.push_back(num());
         break;
-    default: // wrong procedure call
-        t->expr.err=ErrKind::Err;
-        syntaxError("unexpected token -> ");
-        break;
-    }
-    ///TODO
-    return t;
-}
-TreeNode* RDParser::relop() {
-    TreeNode* t = new TreeNode(NodeKind::Relop, lineno);
-    switch (token) {
-    case TokenType::tLTE:
-        t->oper.oper = OperKind::LTE; break;
-    case TokenType::tLT:
-        t->oper.oper = OperKind::LT; break;
-    case TokenType::tGT:
-        t->oper.oper = OperKind::GT; break;
-    case TokenType::tGTE:
-        t->oper.oper = OperKind::GTE; break;
-    case TokenType::tEQ:
-        t->oper.oper = OperKind::EQ; break;
-    case TokenType::tNEQ:
-        t->oper.oper = OperKind::NEQ; break;
     default:
-        t->oper.err = ErrKind::Err;
         syntaxError("unexpected token -> ");
-        break;
+        t = new TreeNode(NodeKind::ERROR, lineno);
+        t->type.type = TypeKind::Err;
     }
-    t->child.push_back(additive_expression());
     return t;
 }
-TreeNode* RDParser::additive_expression() {
-    TreeNode* t = new TreeNode(NodeKind::Expr, lineno);
-    
-}
+
 TreeNode* RDParser::type_specifier() {
     TreeNode* t = new TreeNode(NodeKind::Type, lineno);
     if (token==TokenType::tINT) {
@@ -397,6 +464,7 @@ TreeNode* RDParser::type_specifier() {
     }
     return t;
 }
+
 TreeNode* RDParser::num() {
     TreeNode* t = new TreeNode(NodeKind::Num, lineno);
     if (token==TokenType::tNUM) {
