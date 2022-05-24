@@ -9,34 +9,110 @@ Data
 **************************************************/
 
 enum class NodeKind {
-    VarDecl, FunDecl,
-    ParamList, Param,
-    Stmt,
-    LocalDecls, StmtList,
+    Decl, VarDecl, FunDecl,
+    ParamList,
+    LocDecl, StmtList,
+    Stmt, ExprStmt, CmpdStmt, SlctStmt, IterStmt, RetStmt,
     Expr,
+    Assign, Relop, Addop, Mulop,
+    Term, Factor, Call,
+    Var, Type, Ary, Args, Num,
+    ERROR
 };
-enum class DeclKind { VarK, FunK } ;
-typedef enum {VoidK, ListK} ParamKind;
-typedef enum {ExpK, CompK, SelecK, IterK, RetK} StmtKind;
-typedef enum {AsgnK, OpK,ConstK,IdK} ExpKind;
+enum class TypeKind { Int, Void, Err, Null };
+enum class OperKind { LTE, LT, GT, GTE, EQ, NEQ, ADD, SUB, MUL, DIV };
+enum class ErrKind { Null, Err };
 
-/* ExpType is used for type checking */
-typedef enum {Void,Integer,Boolean} ExpType;
-
-typedef struct treeNode {
-    vector<treeNode*> child;
-    treeNode* sibling;
-    int lineno;
-    NodeKind nodekind;
+struct DeclAttr { DeclAttr() : type(TypeKind::Null), id(""), ary(false), num(0) {}
+    TypeKind    type;
+    string      id;
+    bool        ary;
+    int         num;
+    ErrKind     err     = ErrKind::Null;
+};
+struct ParamAttr { ParamAttr() : type(TypeKind::Null), id(""), ary(false) {}
+    TypeKind    type;
+    string      id;
+    bool        ary;
+    ErrKind     err     = ErrKind::Null;
+};
+struct LocDeclAttr { LocDeclAttr() : empty(false) {}
+    bool        empty;
+    ErrKind     err     = ErrKind::Null;
+};
+struct StmtListAttr { StmtListAttr() : empty(false) {}
+    bool        empty;
+    ErrKind     err     = ErrKind::Null;
+};
+struct StmtAttr {
+    bool        empty;
+    ErrKind     err     = ErrKind::Null;
+};
+struct ExprAttr { ExprAttr() : err(ErrKind::Null) {}
+    ErrKind     err     = ErrKind::Null;
+};
+struct OperAttr { OperAttr() : type(TypeKind::Null) {}
+    TypeKind    type;
+    OperKind    oper;
+    ErrKind     err     = ErrKind::Null;
+};
+struct TermAttr { TermAttr() : type(TypeKind::Null), val(0) {}
+    TypeKind    type;
+    int         val;
+    ErrKind     err     = ErrKind::Null;
+};
+struct FactAttr { FactAttr() : type(TypeKind::Null), val(0) {}
+    TypeKind    type;
+    int         val;
+    ErrKind     err     = ErrKind::Null;
+};
+struct CallAttr { CallAttr() : type(TypeKind::Null), id("") {}    
+    TypeKind    type;
+    string      id;
+    ErrKind     err     = ErrKind::Null;
+};
+struct VarAttr { VarAttr() : type(TypeKind::Null), id("") {}
+    TypeKind    type;
+    string      id;
+    ErrKind     err     = ErrKind::Null;
+};
+struct TypeAttr { TypeAttr() : type(TypeKind::Null) {}
+    TypeKind    type;
+    ErrKind     err     = ErrKind::Null;
+};
+struct ArgsAttr {
+    ErrKind     err     = ErrKind::Null;
+};
+struct NumAttr { NumAttr() : str(""), val(0) {}
+    string      str;
+    int         val;
+    ErrKind     err     = ErrKind::Null;
+};
+struct ErrAttr {};
+struct TreeNode {
+    NodeKind nodeKind;
     union {
-        DeclKind decl;
-        StmtKind stmt;
-        ExpKind exp; } kind;
-    union { TokenType op;
-            int val;
-            char * name; } attr;
-    ExpType type; /* for type checking of exps */
-} TreeNode;
+        DeclAttr decl;        
+        ParamAttr param;
+        LocDeclAttr ldecl;
+        StmtListAttr slist;
+        StmtAttr stmt;
+        ExprAttr expr;
+        OperAttr oper;
+        TermAttr term;
+        FactAttr fact;
+        CallAttr call;
+        VarAttr var;
+        TypeAttr type;
+        ArgsAttr args;
+        NumAttr num;
+        ErrAttr err; };
+    vector<TreeNode*>   child;
+    TreeNode*           sibling;
+    int                 lineno;
+
+    TreeNode(NodeKind nodeKind, int lineno);
+};
 
 /**************************************************
 Parser
@@ -46,43 +122,37 @@ public:
     RDParser(ifstream& fcode);
     TreeNode* getTree() { return root; }
 private:
-    TreeNode* root;
-    Scanner scanner;
-    TokenType token;    
+    TreeNode*   root;
+    Scanner     scanner;
+    TokenType   token;
+    string      tokenString;
+    int         lineno;
+    bool        error;
 
     void syntaxError(string message);
     void match(TokenType expected);    
-    TokenType getToken();
+    void nextToken();
     TreeNode* newNode(NodeKind nodeKind);
-    /*************************************************/
+/*************************************************/
     TreeNode* declaration_list();
     TreeNode* declaration();
-    TreeNode* var_declaration();
-    TreeNode* type_specifier();
-    TreeNode* fun_declaration();
     TreeNode* params();
-    TreeNode* param_list();
-    TreeNode* param();
     TreeNode* compound_stmt();
-    TreeNode* local_declaration();
+    TreeNode* local_declarations();
     TreeNode* statement_list();
     TreeNode* statement();
     TreeNode* expression_stmt();
-    TreeNode* selection_stmt();
-    TreeNode* iteration_stmt();
-    TreeNode* return_stmt();
+    TreeNode* compound_stmt();//todo
+    TreeNode* selection_stmt();//todo
+    TreeNode* iteration_stmt();//todo
+    TreeNode* return_stmt();//todo
     TreeNode* expression();
-    TreeNode* var();
-    TreeNode* simple_expression();
     TreeNode* relop();
     TreeNode* additive_expression();
-    TreeNode* addop();
-    TreeNode* term();
-    TreeNode* mulop();
-    TreeNode* factor();
-    TreeNode* call();
-    TreeNode* args();
-    TreeNode* arg_list();
+    
+    TreeNode* type_specifier();
+    TreeNode* args();//todo
+    TreeNode* num();
 };
 
 #endif

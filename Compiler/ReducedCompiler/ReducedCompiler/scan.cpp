@@ -31,7 +31,8 @@ Scanner::Scanner(ifstream& f) :
     fileHeader(FileHeader(f)),
     tokenBuffer(""),
     flushFlag(false),
-    errorType(TokErrType::eNOERROR) {
+    errorType(TokErrType::eNOERROR),
+    lineno(1) {
     
     // build DFA
     EOFSTR.push_back(EOF);
@@ -131,7 +132,11 @@ TokenType Scanner::processChar() {
 
 TokenType Scanner::processToken() {
     TokenType t;
-    while ((t = processChar()) != TokenType::tNULL) {}
+    while ((t = processChar()) != TokenType::tNULL) {
+        if (isNewLine) {
+            lineno++;
+        }
+    }
     return t;
 }
 

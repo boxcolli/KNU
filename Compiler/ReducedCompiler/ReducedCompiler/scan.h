@@ -59,6 +59,7 @@ public:
 	string getToken() { return tokenBuffer; }
 	TokErrType getErrorType() { return errorType; }
 	bool isNewLine() { return newline; }
+	int getLineno() { return lineno; }
 
 private:
 	FileHeader fileHeader;
@@ -68,6 +69,7 @@ private:
 	TokErrType errorType;		// recent error
 	bool flushFlag;				// flush token buffer on next process
 	bool newline;				// recent newline
+	int lineno;
 	
 	string EOFSTR = "";
 	enum class StateData {
