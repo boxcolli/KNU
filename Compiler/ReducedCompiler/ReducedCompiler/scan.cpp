@@ -132,8 +132,8 @@ TokenType Scanner::processChar() {
 
 TokenType Scanner::processToken() {
     TokenType t;
-    while ((t = processChar()) != TokenType::tNULL) {
-        if (isNewLine) {
+    while ((t = processChar()) == TokenType::tNULL) {
+        if (isNewLine()) {
             lineno++;
         }
     }

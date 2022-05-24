@@ -24,20 +24,17 @@
     <ClCompile Include="state.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="bnf.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="globals.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="tree.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bnf.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="fhead.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -51,6 +48,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="state.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="tree.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

@@ -139,20 +139,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="bnf.cpp" />
     <ClCompile Include="globals.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parse.cpp" />
     <ClCompile Include="scan.cpp" />
     <ClCompile Include="state.cpp" />
+    <ClCompile Include="tree.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bnf.h" />
     <ClInclude Include="fhead.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="parse.h" />
     <ClInclude Include="scan.h" />
     <ClInclude Include="state.h" />
+    <ClInclude Include="tree.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

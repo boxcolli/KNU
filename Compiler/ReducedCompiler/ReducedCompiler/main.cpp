@@ -1,36 +1,27 @@
 #include "globals.h"
 #include "scan.h"
-#include "bnf.h"
 #include "parse.h"
 
 int main() {
-    ifstream fbnf("resources/bnf.txt");
-    if (fbnf.is_open()) {
+    ifstream fcode("resources/1.c");
+    if (fcode.is_open()) {
         cout << "open" << endl;
     }
 
-    ofstream fout("resources/fout.txt");
+    /*Scanner scanner(fcode);
+    while (scanner.processToken()!=TokenType::tERROR) {
+        cout << scanner.getToken() << endl;
+    }*/
 
-    FirstFollow ff(fbnf);
+    RDParser parser(fcode);
+    parser.getTree()->show(cout);
+
+    /*TreeNode* t = new TreeNode(NodeKind::Decl, 0);
+    t->decl = DeclAttr();*/
     
-    fout << "first------------------------------" << endl;
-    for (auto keyval : ff.firsts) {
-        fout << keyval.first << ":";
-        for (string s : keyval.second) {
-            fout << " " << s;
-        }
-        fout << endl;
-    }
-    fout << endl;
+
     
-    fout << "follow------------------------------" << endl;
-    for (auto keyval : ff.follows) {
-        fout << keyval.first << ":";
-        for (string s : keyval.second) {
-            fout << " " << s;
-        }
-        fout << endl;
-    }
+    
 
     return 0;
 }
