@@ -45,8 +45,11 @@ struct StmtListAttr { StmtListAttr() : empty(false) {}
     ErrKind     err     = ErrKind::Null;
 };
 struct StmtAttr {
-    bool        empty;
+    bool        empty   = false;
     ErrKind     err     = ErrKind::Null;
+};
+struct CmpdAttr {
+
 };
 struct ExprAttr { ExprAttr() : err(ErrKind::Null) {}
     ErrKind     err     = ErrKind::Null;
@@ -136,12 +139,12 @@ private:
     TreeNode* statement_list();
     TreeNode* statement();
     TreeNode* expression_stmt();
-    TreeNode* compound_stmt();//todo
-    TreeNode* selection_stmt();//todo
+    TreeNode* compound_stmt();
+    TreeNode* selection_stmt();//WIP
     TreeNode* iteration_stmt();//todo
     TreeNode* return_stmt();//todo
     TreeNode* expression();
-    TreeNode* additive_expression();//WIP
+    TreeNode* additive_expression();
     
     TreeNode* term();
     TreeNode* factor();

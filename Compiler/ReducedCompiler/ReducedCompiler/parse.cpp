@@ -283,6 +283,29 @@ TreeNode* RDParser::expression_stmt() {
     return t;
 }
 
+TreeNode* RDParser::compound_stmt() {
+    TreeNode* t = new TreeNode(NodeKind::CmpdStmt, lineno);
+    match(TokenType::tLCB);
+    t->child.push_back(local_declarations());
+    t->child.push_back(statement_list());
+    match(TokenType::tRCB);
+    return t;
+}
+
+TreeNode* RDParser::selection_stmt() {
+    TreeNode* t = new TreeNode(NodeKind::SlctStmt, lineno);
+    match(TokenType::tIF);
+    match(TokenType::tLP);
+    t->child.push_back(expression());
+    match(TokenType::tRP);
+    t->child.push_back(statement());
+    if (token==TokenType::tELSE) {
+        match(TokenType::tELSE);
+        t->child.push_back(statement());
+    }
+    return t;
+}
+
 TreeNode* RDParser::expression() {    
     TreeNode* t = new TreeNode(NodeKind::Expr, lineno);
     TreeNode* p = factor();
@@ -389,15 +412,17 @@ TreeNode* RDParser::additive_expression() {
         if (firstOper) {
             firstOper = false;
             t = q;
+            r = term();
         }
         else {
-
+            q->child.push_back(r);
+            p->child.push_back(q);
+            p = q;
+            r = term();
         }
-        
     }
-    p->child.push_back(r);
+    if (r!=nullptr) { p->child.push_back(r); }    
     return t;
-    
 }
 
 TreeNode* RDParser::term() {
