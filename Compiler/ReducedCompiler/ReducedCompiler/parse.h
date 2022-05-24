@@ -18,7 +18,7 @@ public:
 private:
     ifstream&   fcode;
     Scanner     scanner;
-    TreeNode*   root;    
+    TreeNode*   root;
     TokenType   token;
     string      tokenString;
     int         lineno;
@@ -41,8 +41,7 @@ private:
     TreeNode* iteration_stmt();
     TreeNode* return_stmt();
     TreeNode* expression();
-    TreeNode* additive_expression();
-    
+    TreeNode* additive_expression();    
     TreeNode* term();
     TreeNode* factor();
     TreeNode* var();

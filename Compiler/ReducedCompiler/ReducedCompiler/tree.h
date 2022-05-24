@@ -17,7 +17,7 @@ enum class NodeKind {
     ERROR
 };
 enum class TypeKind { Int, Void, Err, Null };
-enum class OperKind { LTE, LT, GT, GTE, EQ, NEQ, ADD, SUB, MUL, DIV, Null };
+enum class OperKind { Assign, LTE, LT, GT, GTE, EQ, NEQ, ADD, SUB, MUL, DIV, Null };
 enum class ErrKind { Null, Err };
 
 struct DeclAttr { ~DeclAttr();

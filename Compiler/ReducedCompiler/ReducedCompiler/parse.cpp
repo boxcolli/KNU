@@ -31,6 +31,11 @@ void RDParser::match(TokenType expected) {
     if (token == expected) nextToken();
     else {
         syntaxError("unexpected token -> ");
+        if (expected == TokenType::tSEMI) {
+            while (token!=TokenType::tSEMI) {
+                nextToken();
+            }
+        }
     }
 }
 
@@ -109,6 +114,7 @@ TreeNode* RDParser::params() {
     TreeNode* q = nullptr;
     if (token==TokenType::tVOID) {
         // VOID
+        match(TokenType::tVOID);
         t->paraml.empty = true;
     }
     else {
@@ -312,6 +318,7 @@ TreeNode* RDParser::expression() {
         if (token==TokenType::tASSIGN) {
             match(TokenType::tASSIGN);
             q = new TreeNode(NodeKind::Assign, lineno);
+            q->oper.oper = OperKind::Assign;
             q->child.push_back(p);
             q->child.push_back(expression());
             t->child.push_back(q);

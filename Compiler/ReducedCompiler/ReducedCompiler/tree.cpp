@@ -97,6 +97,7 @@ string tktos(TypeKind tk) {
 }
 string oktos(OperKind ok) {
     switch (ok) {
+    case OperKind::Assign: return "Assign";
     case OperKind::LTE: return "LTE";
     case OperKind::LT: return "LT";
     case OperKind::GT: return "GT";
@@ -131,8 +132,8 @@ void TreeNode::show(ostream& out, int level) {
 // Step 1: print myself and my attributes
     out << string(level*2, ' ');
     out << nktos(nodeKind);
-    out << " : ";
-    out << lineno;
+    out << " :";
+    //out << lineno;
 switch (nodeKind) {
 case NodeKind::Decl:
 case NodeKind::VarDecl:

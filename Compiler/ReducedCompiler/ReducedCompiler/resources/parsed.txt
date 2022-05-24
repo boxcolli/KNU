@@ -1,0 +1,19 @@
+VarDecl : [a] [false]
+  Type : [Int]
+FunDecl : [main] [false]
+  Type : [Int]
+  ParamList : [true]
+  CmpdStmt :
+    LocDecl : [true]
+    StmtList : [false]
+      ExprStmt : [false]
+        Expr :
+          Assign : [Assign]
+            Var : [a]
+            Expr :
+              Oper : [ADD]
+                Num : [1]
+                Mulop : [MUL]
+                  Num : [2]
+                  Num : [3]
+      ExprStmt : [true]
