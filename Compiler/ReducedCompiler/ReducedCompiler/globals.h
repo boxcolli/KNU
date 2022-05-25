@@ -10,11 +10,9 @@
 #include <set>
 using namespace std;
 
-// Parser
-#define EPSILON "EMPTY"         // nullable terminal
-#define START_SYM "<program>"   // starting symbol
-#define END_SYM "$"             // end/last/bottom symbol
-
 void MSG_EXIT(string msg);
+
+/* Parser */
+#define INDENTLENGTH 2
 
 #endif

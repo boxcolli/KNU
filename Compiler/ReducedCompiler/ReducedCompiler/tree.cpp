@@ -130,7 +130,7 @@ string spcheck(string* sp) {
 void TreeNode::show(ostream& out, int level) {
     out << boolalpha;
 // Step 1: print myself and my attributes
-    out << string(level*2, ' ');
+    out << string(level*INDENTLENGTH, ' ');
     out << nktos(nodeKind);
     out << " :";
     //out << lineno;

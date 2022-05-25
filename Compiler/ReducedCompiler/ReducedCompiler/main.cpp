@@ -8,20 +8,10 @@ int main() {
         cout << "open" << endl;
     }
 
-    /*Scanner scanner(fcode);
-    while (scanner.processToken()!=TokenType::tERROR) {
-        cout << scanner.getToken() << endl;
-    }*/
     ofstream fout("resources/parsed.txt");
     RDParser parser(fcode);
+    cout << "parse end" << endl;
     parser.getTree()->show(fout);
-
-    /*TreeNode* t = new TreeNode(NodeKind::Decl, 0);
-    t->decl = DeclAttr();*/
     
-
-    
-    
-
     return 0;
 }

@@ -32,8 +32,9 @@ void RDParser::match(TokenType expected) {
     else {
         syntaxError("unexpected token -> ");
         if (expected == TokenType::tSEMI) {
-            while (token!=TokenType::tSEMI) {
-                nextToken();
+            while ((token!=TokenType::tSEMI)
+                &&(token!=TokenType::tERROR)) {
+                nextToken(); 
             }
         }
     }
@@ -53,6 +54,8 @@ TreeNode* RDParser::declaration_list() {
     TreeNode* t = declaration();
     TreeNode* p = t;
     TreeNode* q;
+    if (t->err==ErrKind::Err)
+        { nextToken(); }
     while ((token != TokenType::tERROR)
         && (token != TokenType::tNULL)
         && (token != TokenType::tELSE)
@@ -64,6 +67,8 @@ TreeNode* RDParser::declaration_list() {
         && (token != TokenType::tRCB)
         && (token != TokenType::tCOMMENT)) {        
         q = declaration();
+        if (q->err==ErrKind::Err)
+            { nextToken(); }
         p->sibling = q;
         p = q;
     }
@@ -76,7 +81,7 @@ TreeNode* RDParser::declaration() {
     t->child.push_back(type_specifier());
     // ID
     if (token==TokenType::tID) {
-        t->decl.id = new string(tokenString);        
+        t->decl.id = new string(tokenString);
         nextToken();
     }
     else { syntaxError("unexpected token -> "); }
@@ -103,6 +108,7 @@ TreeNode* RDParser::declaration() {
         break;
     default:
         syntaxError("unexpected token -> ");
+        t->err = ErrKind::Err;
         break;
     }
     return t;

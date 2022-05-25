@@ -22,7 +22,7 @@ enum class ErrKind { Null, Err };
 
 struct DeclAttr { ~DeclAttr();
     string*      id     = nullptr;
-    bool        ary     = false;    
+    bool        ary     = false;
 };
 struct ParamListAttr {
     bool        empty   = false;
