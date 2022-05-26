@@ -54,16 +54,14 @@ struct RetStmtAttr {
 struct ExprAttr {
 };
 struct OperAttr {
-    TypeKind    type    = TypeKind::Null;
     OperKind    oper    = OperKind::Null;
 };
 struct CallAttr { ~CallAttr();
-    TypeKind    type    = TypeKind::Null;
     string*      id     = nullptr;
 };
 struct VarAttr { ~VarAttr();
-    TypeKind    type    = TypeKind::Null;
     string*      id     = nullptr;
+    bool        ary     = false;
 };
 struct TypeAttr {
     TypeKind    type    = TypeKind::Null;

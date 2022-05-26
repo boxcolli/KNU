@@ -1,10 +1,21 @@
+
+>>>Syntax error at line 7: unexpected token -> (was: void)
+
+>>>Syntax error at line 7: Code ends before file
+(was: ))
 FunDecl : [fun] [false]
-  Type : [Int]
-  ParamList : [false]
-    Param : [a] [false]
-      Type : [Int]
-    Param : [b] [false]
-      Type : [Int]
-  CmpdStmt :
-    LocDecl : [true]
-    StmtList : [true]
+| Type : [void]
+| ParamList : [true]
+| CmpdStmt :
+| | LocDecl : [true]
+| | StmtList : [false]
+| | | ExprStmt : [false]
+| | | | Expr :
+| | | | | Assign : [Assign]
+| | | | | | Var : [a] [false]
+| | | | | | Expr :
+| | | | | | | Num : [10]
+VarDecl : [b] [false]
+| Type : [Int]
+Decl : [main] [false]
+| Type : [void]

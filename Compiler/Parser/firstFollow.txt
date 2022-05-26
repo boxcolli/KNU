@@ -1,0 +1,62 @@
+first------------------------------
+<additive-expression>: ID LPAREN NUM
+<addop>: ADD SUB
+<arg-list>: ID LPAREN NUM
+<args>: ID LPAREN NUM
+<call>: ID
+<compound-stmt>: LCBRACK
+<declaration-list>: INT VOID
+<declaration>: INT VOID
+<expression-stmt>: ID LPAREN NUM SEMI
+<expression>: ID LPAREN NUM
+<factor>: ID LPAREN NUM
+<fun-declaration>: INT VOID
+<iteration-stmt>: WHILE
+<local-declarations>: INT VOID
+<mulop>: DIV MUL
+<param-list>: INT VOID
+<param>: INT VOID
+<params>: INT VOID
+<program>: INT VOID
+<relop>: EQ GT GTE LT LTE NEQ
+<return-stmt>: RETURN
+<selection-stmt>: IF
+<simple-expression>: ID LPAREN NUM
+<statement-list>: ID IF LCBRACK LPAREN NUM RETURN SEMI WHILE
+<statement>: ID IF LCBRACK LPAREN NUM RETURN SEMI WHILE
+<term>: ID LPAREN NUM
+<type-specifier>: INT VOID
+<var-declaration>: INT VOID
+<var>: ID
+
+follow------------------------------
+<additive-expression>: ADD EQ COMMA GT GTE LT LTE NEQ RPAREN RSBRACK SEMI SUB
+<addop>: ID LPAREN NUM
+<arg-list>: COMMA RPAREN
+<args>: RPAREN
+<call>: ADD EQ COMMA DIV GT GTE LT LTE MUL NEQ RPAREN RSBRACK SEMI SUB
+<compound-stmt>: $ ELSE ID IF INT LCBRACK LPAREN NUM RCBRACK RETURN SEMI VOID WHILE
+<declaration-list>: $ INT VOID
+<declaration>: $ INT VOID
+<expression-stmt>: ELSE ID IF LCBRACK LPAREN NUM RCBRACK RETURN SEMI WHILE
+<expression>: COMMA RPAREN RSBRACK SEMI
+<factor>: ADD EQ COMMA DIV GT GTE LT LTE MUL NEQ RPAREN RSBRACK SEMI SUB
+<fun-declaration>: $ INT VOID
+<iteration-stmt>: ELSE ID IF LCBRACK LPAREN NUM RCBRACK RETURN SEMI WHILE
+<loca-declarations>: ID IF LCBRACK LPAREN NUM RCBRACK RETURN SEMI WHILE
+<local-declarations>: INT VOID
+<mulop>: ID LPAREN NUM
+<param-list>: COMMA RPAREN
+<param>: COMMA RPAREN
+<params>: RPAREN
+<program>: $
+<relop>: ID LPAREN NUM
+<return-stmt>: ELSE ID IF LCBRACK LPAREN NUM RCBRACK RETURN SEMI WHILE
+<selection-stmt>: ELSE ID IF LCBRACK LPAREN NUM RCBRACK RETURN SEMI WHILE
+<simple-expression>: COMMA RPAREN RSBRACK SEMI
+<statement-list>: ID IF LCBRACK LPAREN NUM RCBRACK RETURN SEMI WHILE
+<statement>: ELSE ID IF LCBRACK LPAREN NUM RCBRACK RETURN SEMI WHILE
+<term>: ADD EQ COMMA DIV GT GTE LT LTE MUL NEQ RPAREN RSBRACK SEMI SUB
+<type-specifier>: ID
+<var-declaration>: $ INT VOID
+<var>: ADD EQ COMMA DIV ASSIGN GT GTE LT LTE MUL NEQ RPAREN RSBRACK SEMI SUB

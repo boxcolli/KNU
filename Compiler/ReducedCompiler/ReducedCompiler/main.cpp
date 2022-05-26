@@ -8,8 +8,13 @@ int main() {
         cout << "open" << endl;
     }
 
+    //Scanner scanner(fcode);
+    //while (scanner.processToken() != TokenType::tERROR) {
+    //    cout << scanner.getToken() << endl;
+    //}
+
     ofstream fout("resources/parsed.txt");
-    RDParser parser(fcode);
+    RDParser parser(fcode, fout);
     cout << "parse end" << endl;
     parser.getTree()->show(fout);
     

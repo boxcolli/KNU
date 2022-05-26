@@ -11,12 +11,12 @@ Parser
 
 class RDParser {
 public:
-    RDParser();
-    RDParser(ifstream& fcode);
+    RDParser(ifstream& fcode, ostream& out);
     TreeNode* getTree() { return root; }
 
 private:
     ifstream&   fcode;
+    ostream&    out;
     Scanner     scanner;
     TreeNode*   root;
     TokenType   token;
@@ -27,7 +27,6 @@ private:
     void syntaxError(string message);
     void match(TokenType expected);    
     void nextToken();
-    TreeNode* newNode(NodeKind nodeKind);
 /*************************************************/
     TreeNode* declaration_list();
     TreeNode* declaration();
@@ -41,10 +40,9 @@ private:
     TreeNode* iteration_stmt();
     TreeNode* return_stmt();
     TreeNode* expression();
-    TreeNode* additive_expression();    
+    TreeNode* additive_expression();
     TreeNode* term();
     TreeNode* factor();
-    TreeNode* var();
     TreeNode* call();
     TreeNode* type_specifier();
     TreeNode* args();

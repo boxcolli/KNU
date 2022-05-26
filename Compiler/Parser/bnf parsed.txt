@@ -1,0 +1,134 @@
+grammar
+<program>[0] : <declaration-list>
+<declaration-list>[1] : <declaration-list> <declaration>
+<declaration-list>[2] : <declaration>
+<declaration>[3] : <var-declaration>
+<declaration>[4] : <fun-declaration>
+<var-declaration>[5] : <type-specifier> ID SEMI
+<var-declaration>[6] : <type-specifier> ID LSBRACK NUM RSBRACK SEMI
+<type-specifier>[7] : INT
+<type-specifier>[8] : VOID
+<fun-declaration>[9] : <type-specifier> ID LPAREN <params> RPAREN <compound-stmt>
+<params>[10] : <param-list>
+<params>[11] : VOID
+<param-list>[12] : <param-list> COMMA <param>
+<param-list>[13] : <param>
+<param>[14] : <type-specifier> ID
+<param>[15] : <type-specifier> ID LSBRACK RSBRACK
+<compound-stmt>[16] : LCBRACK <locaUdeclarations> <statement-list> RCBRACK
+<local-declarations>[17] : <local-declarations> <var-declaration>
+<local-declarations>[18] : EMPTY
+<statement-list>[19] : <statement-list> <statement>
+<statement-list>[20] : EMPTY
+<statement>[21] : <expression-stmt>
+<statement>[22] : <compound-stmt>
+<statement>[23] : <selection-stmt>
+<statement>[24] : <ieration-stmt>
+<statement>[25] : <return-stmt>
+<expession-stmt>[26] : <expression> SEMI
+<expession-stmt>[27] : SEMI
+<selection-stmt>[28] : IF LPAREN <expression> RPAREN <statement>
+<selection-stmt>[29] : IF LPAREN <expression> RPAREN <statement> ELSE <statement>
+<iteration-stmt>[30] : WHILE LPAREN <expression> RPAREN <statement>
+<retum-stmt>[31] : RETURN SEMI
+<retum-stmt>[32] : RETURN <expression> SEMI
+<expression>[33] : <var> EQ <expression>
+<expression>[34] : <simple-expression>
+<var>[35] : ID
+<var>[36] : ID LSBRACK <expression> RSBRACK
+<simple-expression>[37] : <additive-expression> <relop> <additive-expression>
+<simple-expression>[38] : <additive-expression>
+<relop>[39] : LTE
+<relop>[40] : LT
+<relop>[41] : GT
+<relop>[42] : GTE
+<relop>[43] : ASSIGN
+<relop>[44] : NEQ
+<additive-expression>[45] : <additive-expression> <addop> <term>
+<additive-expression>[46] : <term>
+<addop>[47] : ADD
+<addop>[48] : SUB
+<term>[49] : <term> <mulop> <factor>
+<term>[50] : <factor>
+<mulop>[51] : MUL
+<mulop>[52] : DIV
+<factor>[53] : LPAREN <expression> RPAREN
+<factor>[54] : <var>
+<factor>[55] : <call>
+<factor>[56] : NUM
+<call>[57] : ID LPAREN <args> RPAREN
+<args>[58] : <arg-list>
+<args>[59] : EMPTY
+<arg-list>[60] : <arg-list> COMMA <expression>
+<arg-list>[61] : <expression>
+
+
+
+symbol map
+<additive-expression> : 45 47
+<addop> : 47 49
+<arg-list> : 60 62
+<args> : 58 60
+<call> : 57 58
+<compound-stmt> : 16 17
+<declaration-list> : 1 3
+<declaration> : 3 5
+<expession-stmt> : 26 28
+<expression> : 33 35
+<factor> : 53 57
+<fun-declaration> : 9 10
+<iteration-stmt> : 30 31
+<local-declarations> : 17 19
+<mulop> : 51 53
+<param-list> : 12 14
+<param> : 14 16
+<params> : 10 12
+<program> : 0 1
+<relop> : 39 45
+<retum-stmt> : 31 33
+<selection-stmt> : 28 30
+<simple-expression> : 37 39
+<statement-list> : 19 21
+<statement> : 21 26
+<term> : 49 51
+<type-specifier> : 7 9
+<var-declaration> : 5 7
+<var> : 35 37
+
+
+
+term set
+ADD
+ASSIGN
+COMMA
+DIV
+EMPTY
+EQ
+GT
+GTE
+ID
+IF
+INT
+LCBRACK
+LPAREN
+LSBRACK
+LT
+LTE
+MUL
+NEQ
+NUM
+RCBRACK
+RETURN
+RPAREN
+RSBRACK
+SEMI
+SUB
+VOID
+WHILE
+
+
+
+nullable
+<args>
+<local-declarations>
+<statement-list>

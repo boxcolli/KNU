@@ -40,7 +40,7 @@ TreeNode::TreeNode(NodeKind nodeKind, int lineno) {
     case NodeKind::IterStmt:    iter=ItrStmtAttr(); break;
     case NodeKind::RetStmt:     ret=RetStmtAttr(); break;
     case NodeKind::Expr:        expr=ExprAttr(); break;
-    case NodeKind::Oper:
+    case NodeKind::Oper:        
     case NodeKind::Assign:
     case NodeKind::Relop:
     case NodeKind::Addop:
@@ -130,7 +130,10 @@ string spcheck(string* sp) {
 void TreeNode::show(ostream& out, int level) {
     out << boolalpha;
 // Step 1: print myself and my attributes
-    out << string(level*INDENTLENGTH, ' ');
+    //out << string(level*INDENTLENGTH, ' ');
+    for (int i = 0; i < level; i++) {
+        out << "| ";
+    }    
     out << nktos(nodeKind);
     out << " :";
     //out << lineno;
@@ -181,6 +184,7 @@ case NodeKind::Call:
     break;
 case NodeKind::Var:
     out << " [" << spcheck(var.id) << "]";
+    out << " [" << var.ary << "]";
     break;
 case NodeKind::Type:
     out << " [" << tktos(type.type) << "]";
