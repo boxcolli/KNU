@@ -1,0 +1,24 @@
+"Twitter Korean Text
+(ntags=19)"	
+Tag	Description
+Noun: 명사 (Nouns, Pronouns, Company Names, Proper Noun, Person Names, Numerals, Standalone, Dependent)
+Verb: 동사
+Adjective: 형용사
+Determiner: 관형사 (ex: 새, 헌, 참, 첫, 이, 그, 저)
+Adverb: 부사 (ex: 잘, 매우, 빨리, 반드시, 과연)
+Conjunction: 접속사	
+Exclamation: 감탄사 (ex:  헐, 어머나, 얼씨구)
+Josa: 조사 (ex: 의, 에, 에서)
+PreEomi: 선어말어미 (ex: 었)
+Eomi: 어미 (ex: 다, 요, 여, 하댘ㅋㅋ)
+Suffix: 접미사
+Punctuation: 구두점
+Foreign: 외국어, 한자 및 기타기호
+Alpha: 알파벳
+Number: 숫자
+Unknown: 미등록어
+KoreanParticle: (ex: ㅋㅋ)
+Hashtag: 트위터 해쉬태그 (ex #히히)
+ScreenName: 트위터 아이디 (ex @echojuliett)
+Email: 이메일 주소
+URL: 웹주소

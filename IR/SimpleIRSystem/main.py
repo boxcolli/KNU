@@ -3,7 +3,7 @@ if __name__ == '__main__':
 
 import os
 
-print(os.environ.get('JAVA_HOME'))
+print('using:', os.environ.get('JAVA_HOME'))
 
 import analyze as an
 
@@ -24,5 +24,10 @@ double = '<title>1. 지미 카터</title>\
 체첸에서 사용되는 언어는 체첸어와 러시아어이다. \
 체첸어는 캅카스제어 중, 북동 캅카스제어로 불리는 그룹에 속하는데 인구시어와 매우 밀접한 관계에 있다.'
 
+an.printTags(single)
 
-print(an.tagMe(single))
+
+#---- Split Document ----#
+#---- Tag and Insert ----#
+#---- Count Term ----#
+#----
