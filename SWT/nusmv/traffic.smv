@@ -1,0 +1,34 @@
+MODULE main
+
+	VAR
+		state: {Init, Ready, EWGreen, NSGreen, Pause};
+		event: {None, On, Off}
+		ew-go: {Green, Yellow, Red, Off};
+		ew-left: {On, Off};
+		ns-go: {Green, Yellow, Red, Off};
+		ns-left: {On, Off};
+		time: 0..13;
+
+	ASSIGN
+		init(state) := Init;
+		init(event) := None;
+		init(ew-go) := Off;
+		init(ew-left) := Off;
+		init(ns-go) := Off;
+		init(ns-left) := Off;
+		init(time) := 0;
+
+
+	next(state) := case
+		state = Init & event = On : Ready;
+		state = Ready & time = 3 : EWGreen;
+		state = EWGreen & event = Off : Pause;
+		state = EWGreen & time = 12 : NSGreen;
+		state = NSGreen & event = Off : Pause;
+		state = NSGreen & time = 12 : EWGreen;
+		state = Pause & time = 3 : Init;
+		TRUE : state;
+	esac;
+
+	
+

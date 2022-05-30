@@ -1,0 +1,8 @@
+NuSMV -int
+read_model -i {filename}
+go
+set verbose_level {number}
+show_property
+check_ltlspec -n {number}
+quit
+help {command_line}
