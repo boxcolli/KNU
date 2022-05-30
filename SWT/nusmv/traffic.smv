@@ -3,32 +3,39 @@ MODULE main
 	VAR
 		state: {Init, Ready, EWGreen, NSGreen, Pause};
 		event: {None, On, Off}
-		ew-go: {Green, Yellow, Red, Off};
-		ew-left: {On, Off};
-		ns-go: {Green, Yellow, Red, Off};
-		ns-left: {On, Off};
-		time: 0..13;
+		go-ew: {Green, Yellow, Red, Off};
+		left-ew: {On, Off};
+		go-ns: {Green, Yellow, Red, Off};
+		left-ns: {On, Off};
+		time: 0..12;
 
 	ASSIGN
 		init(state) := Init;
 		init(event) := None;
-		init(ew-go) := Off;
-		init(ew-left) := Off;
-		init(ns-go) := Off;
-		init(ns-left) := Off;
+		init(go-ew) := Off;
+		init(left-ew) := Off;
+		init(go-ns) := Off;
+		init(left-ns) := Off;
 		init(time) := 0;
 
 
-	next(state) := case
-		state = Init & event = On : Ready;
-		state = Ready & time = 3 : EWGreen;
-		state = EWGreen & event = Off : Pause;
-		state = EWGreen & time = 12 : NSGreen;
-		state = NSGreen & event = Off : Pause;
-		state = NSGreen & time = 12 : EWGreen;
-		state = Pause & time = 3 : Init;
-		TRUE : state;
-	esac;
+		next(state) := case
+			state = Init & event = On : Ready;
+			state = Ready & time = 3 : EWGreen;
+			state = EWGreen & event = Off : Pause;
+			state = EWGreen & time = 12 : NSGreen;
+			state = NSGreen & event = Off : Pause;
+			state = NSGreen & time = 12 : EWGreen;
+			state = Pause & time = 3 : Init;
+			TRUE : state;
+		esac;
+
+		next(time) := case
+			state = EWGreen & time < 11 : time + 1;			
+			state = NSGreen & time < 11 : time + 1;
+			state = EWGreen & time = 12 : 0;
+			state = NSGreen & time = 12 : 0;
+			
 
 	
 
