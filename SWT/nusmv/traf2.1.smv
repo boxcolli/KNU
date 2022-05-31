@@ -99,9 +99,12 @@ SPEC EF (state = Ready)
 SPEC EF (state = EW)
 SPEC EF (state = NS)
 SPEC EF (state = Pause)
--- Transition coverage
-
+-- State Path Detection
+LTLSPEC G ! (state = Init)
+LTLSPEC G ! (state = Ready)
+LTLSPEC G ! (state = EW)
+LTLSPEC G ! (state = NS)
+LTLSPEC G ! (state = Pause)
+LTLSPEC G ! (state != Init & X (state = Init))
 -- Other test cases
-SPEC AG ! (state in {Init, Ready, Pause} & go_ns = Green)
-SPEC AG ! (state in {Init, Ready, Pause} & left_ns = On)
-SPEC AG ! (go_ew = Green & go_ns = Green)
+LTLSPEC G ! (go_ew = Green & go_ns = Green)

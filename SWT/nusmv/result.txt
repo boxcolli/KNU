@@ -1,0 +1,6 @@
+**** PROPERTY LIST [ Type, Status, Counter-example Number, Name ] ****
+--------------------------  PROPERTY LIST  -------------------------
+000 : G !(go_ew = Green & go_ns = Green)
+  [LTL            Unchecked      N/A    N/A]
+NuSMV > check_ltlspec
+-- specification  G !(go_ew = Green & go_ns = Green)  is true

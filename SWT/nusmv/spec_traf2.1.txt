@@ -1,0 +1,19 @@
+-- State coverage
+SPEC EF (state = Init)
+SPEC EF (state = Ready)
+SPEC EF (state = EW)
+SPEC EF (state = NS)
+SPEC EF (state = Pause)
+-- State Path Detection
+LTLSPEC G ! (state = Init)
+LTLSPEC G ! (state = Ready)
+LTLSPEC G ! (state = EW)
+LTLSPEC G ! (state = NS)
+LTLSPEC G ! (state = Pause)
+LTLSPEC G ! (state != Init & X (state = Init))
+-- Other test cases
+SPEC AG ! (go_ew = Green & go_ns = Green)
+SPEC AG (state = Ready -> go_ns != Green)
+SPEC AG (state = Ready -> left_ns != On)
+SPEC AG (state = Init & control = On -> EX (time = 0))
+SPEC AG ((state = EW | state = NS) & control = Off -> EX (time = 0))
