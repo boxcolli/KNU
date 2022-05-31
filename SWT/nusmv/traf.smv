@@ -1,89 +1,47 @@
 MODULE main
 
-    DEFINE        
-        time_ready := 3;
-        time_yellow := 10;
-        time_left := 5;
-        time_switch := 12;
-        time_pause := 3;
-        
-        
-    
-    VAR
-        state: {Init, Ready, EW_green, NS_green, Pause};
-        control: {None, On, Off};
-        go_ew: {Green, Yellow, Red, Off};
-        left_ew: {On, Off};
-        go_ns: {Green, Yellow, Red, Off};
-        left_ns: {On, Off};
-        time : 0..12;
+	DEFINE
+		switch := 11
 
-    ASSIGN
-        init(state) := Init;
-        init(control) := None;
-        init(go_ew) := Off;
-        init(left_ew) := Off;
-        init(go_ns) := Off;
-        init(left_ns) := Off;
-        init(time) := 0;
+	VAR
+		state: {Init, Ready, EWGreen, NSGreen, Pause};
+		event-outer: {None, On, Off}
+		event-inner: {None, Switch, On, Off}
+		go-ew: {Green, Yellow, Red, Off}; -- "go" sign
+		left-ew: {On, Off}; -- "turn left" sign
+		go-ns: {Green, Yellow, Red, Off};
+		left-ns: {On, Off};
+		time: 0..12; -- strict elapsed time
 
-        next(state) := case
-            state = Init & control = On : Ready;
-            state = Ready & time = time_ready - 1 : EW_green;
-            state = EW_green & control = Off : Pause;
-            state = NS_green & control = Off : Pause;
-            state = EW_green & time = time_switch - 1 : NS_green;
-            state = NS_green & time = time_switch - 1 : EW_green;
-            state = Pause & time = time_pause - 1 : Init;
-            TRUE : state;
-        esac;
+	ASSIGN
+		init(state) := Init;
+		init(event-outer) := None;
+		init(event-inner) := None;
+		init(go-ew) := Off;
+		init(left-ew) := Off;
+		init(go-ns) := Off;
+		init(left-ns) := Off;
+		init(time) := 0;
 
-        next(time) := case
-            state = Ready & time < time_ready : time + 1;
-            state = EW_green & time < time_switch : time + 1;
-            state = NS_green & time < time_switch : time + 1;
-            state = Pause & time < time_pause : time + 1;
-            TRUE : 0;
-        esac;
+		next(state) := case
+			state = Init & event = On : Ready;
+			state = Ready & time = 2 : EWGreen; -- enter EW green state in prev(time=2)
+			state = EWGreen & event = Off : Pause;
+			state = EWGreen & time = 12 : NSGreen;
+			state = NSGreen & event = Off : Pause;
+			state = NSGreen & time = 12 : EWGreen;
+			state = Pause & time = 3 : Init;
+			TRUE : state;
+		esac;
 
-        next(go_ew) := case
-            state = Init & control = On : Red; -- Init -> Ready
-            state = Ready & time = time_ready : Green; -- Ready -> EW_green
-            state = EW_green & control = Off : Red; -- EW_green -> Pause
-            state = NS_green & control = Off : Red; -- NS_green -> Pause
-            state = Pause & time = time_pause : Off; -- Pause -> Init
-            state = EW_green & time = time_yellow - 1 : Yellow;
-            state = EW_green & time = time_switch - 1: Red;
-            TRUE : go_ew;
-        esac;
+		next(time) := case
+			state = Ready & time < 2 : time + 1;
+			state = EWGreen & time < 11 : time + 1;			
+			state = NSGreen & time < 11 : time + 1;
+			state = EWGreen & time = 12 : 1; -- falls to 1, not 0
+			state = NSGreen & time = 12 : 1;
+			TRUE : 0;
+			
 
-        next(left_ew) := case
-            state = EW_green & time = time_left - 1 : On;
-            state = EW_green & time = time_yellow - 1 : Off;
-            TRUE : left_ew;
-        esac;
+	
 
-        next(go_ns) := case
-            state = Init & control = On : Red; -- Init -> Ready
-            state = Ready & time = time_ready : Green; -- Ready -> EW_green
-            state = NS_green & control = Off : Red; -- EW_green -> Pause
-            state = EW_green & control = Off : Red; -- NS_green -> Pause
-            state = Pause & time = time_pause : Off; -- Pause -> Init
-            state = NS_green & time = time_yellow - 1 : Yellow;
-            state = NS_green & time = time_switch - 1: Red;
-            TRUE : go_ns;
-        esac;
-
-        next(left_ns) := case
-            state = NS_green & time = time_left - 1 : On;
-            state = NS_green & time = time_yellow - 1 : Off;
-            TRUE : left_ns;
-        esac;
-
--- State coverage
-
--- Transition coverage
-
--- 
-  LTLSPEC G ! (state = Pause)
-  LTLSPEC G ! (go_ew = Green & go_ns = Green)

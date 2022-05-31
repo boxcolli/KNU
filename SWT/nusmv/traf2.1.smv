@@ -1,0 +1,107 @@
+MODULE main
+
+    DEFINE        
+        t_bef_ready := 2; -- time before ready
+        t_bef_yellow := 9; -- time before yellow sign
+        t_bef_left := 4; -- time before turn left sign
+        t_bef_switch := 11; -- time before lane switch
+        t_bef_pause := 2; -- time before completely pause
+        s_running := {EW, NS};
+    
+    VAR
+        state: {Init, Ready, EW, NS, Pause};
+        control: {None, On, Off};
+        go_ew: {Green, Yellow, Red, Off};
+        left_ew: {On, Off};
+        go_ns: {Green, Yellow, Red, Off};
+        left_ns: {On, Off};
+        time : 0..12;
+
+    ASSIGN
+        init(state) := Init;
+        init(control) := None;
+        init(go_ew) := Off;
+        init(left_ew) := Off;
+        init(go_ns) := Off;
+        init(left_ns) := Off;
+        init(time) := 0;
+
+        next(state) := case
+            -- Init
+            state = Init & control = On : Ready;
+            -- Ready
+            state = Ready & time = t_bef_ready : EW;
+            -- Running
+            state = EW & time = t_bef_switch : NS;
+            state = NS & time = t_bef_switch : EW;
+            state in s_running & control = Off : Pause;
+            -- Pause
+            state = Pause & time = t_bef_pause : Init;
+            TRUE : state;
+        esac;
+
+        next(time) := case
+            -- Ready
+            state = Ready & time <= t_bef_ready : time + 1;
+            -- Running
+            state in s_running & control = Off : 0; -- (priority)
+            state in s_running & time <= t_bef_switch : time + 1;
+            -- Pause
+            state = Pause & time <= t_bef_pause : time + 1;
+            TRUE : 0;
+        esac;
+
+        next(go_ew) := case
+            -- Init
+            state = Init & control = On : Red;
+            -- Ready
+            state = Ready & time = t_bef_ready : Green;
+            -- Running
+            state in s_running & control = Off : Red; -- (priority)
+            state = EW & time = t_bef_yellow : Yellow;
+            state = EW & time = t_bef_switch: Red;
+            -- Pause
+            state = Pause & time = t_bef_pause : Off;
+            TRUE : go_ew;
+        esac;
+
+        next(left_ew) := case
+            -- Running
+            state in s_running & control = Off : Off; -- (priority)
+            state = EW & time = t_bef_left : On;            
+            state = EW & time = t_bef_yellow : Off;
+            TRUE : left_ew;
+        esac;
+
+        next(go_ns) := case
+            -- Init
+            state = Init & control = On : Red;
+            -- Running
+            state in s_running & control = Off : Red; -- (priority)
+            state = NS & time = t_bef_yellow : Yellow;
+            state = NS & time = t_bef_switch : Red;
+            -- Pause
+            state = Pause & time = t_bef_pause : Off;
+            TRUE : go_ns;
+        esac;
+
+        next(left_ns) := case
+            -- Running
+            state in s_running & control = Off : Off; -- (priority)
+            state = NS & time = t_bef_left : On;
+            state = NS & time = t_bef_yellow : Off;
+            TRUE : left_ns;
+        esac;
+
+-- State coverage
+SPEC EF (state = Init)
+SPEC EF (state = Ready)
+SPEC EF (state = EW)
+SPEC EF (state = NS)
+SPEC EF (state = Pause)
+-- Transition coverage
+
+-- Other test cases
+SPEC AG ! (state in {Init, Ready, Pause} & go_ns = Green)
+SPEC AG ! (state in {Init, Ready, Pause} & left_ns = On)
+SPEC AG ! (go_ew = Green & go_ns = Green)
