@@ -36,6 +36,7 @@ def str_get_simple_line(line):
         line = line.replace(c, ' ')
     return line
 
+
 def str_morph_me(txt):
     return okt.morphs(txt, norm=True, stem=True)
 
