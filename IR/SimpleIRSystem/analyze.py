@@ -1,44 +1,60 @@
-from konlpy.tag import Okt
+import tagger as tag
 
-okt = Okt()
+special_ascii = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+special_other = '·\t\n\v\f\r'
 
-stopwordstring = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
 
 
 sampleline = '사랑하고싶게하는가슴속온감정을헤집어놓는영화예요정말최고 헷 km 1245 #%$&'
 
 
-# ---- File --------------------------------------- #
-def file_to_string(filename):
-    return open(filename, 'r', encoding='utf-8').read()
+# ---------------- #
+# ----- File ----- #
+# ---------------- #
 
 
-def file_to_lines(filename):
+# file -> lines
+def f_to_l(filename):
     return open(filename, 'r', encoding='utf-8').readlines()
 
 
-# ---- String --------------------------------------- #
+# ------------------ #
+# ----- String ----- #
+# ------------------ #
 
 
-def str_is_title(line):
+def s_is_title(line):
     if '<title>' in line:
         return True
     else:
         return False
 
 
-def str_get_title(line):
+def s_get_title(line):
     return line.replace('<title>', '').replace('</title>', '')
 
 
-def str_get_simple_line(line):
-    for c in stopwordstring:
+def s_simplify(line):
+    for c in special_ascii:
         line = line.replace(c, ' ')
+    for c in special_other:
+        line = line.replace(c, '')
     return line
 
 
-def str_morph_me(txt):
-    return okt.morphs(txt, norm=True, stem=True)
+def s_extract(line):
+    # drop some characters
+    sline = s_simplify(line)
+
+    return tag.extract(sline)
+
+
+
+
+
+# ----------------- #
+# ----- Print ----- #
+# ----------------- #
 
 
 def print_list(list):
