@@ -13,10 +13,13 @@ import hangeul as hg
 w_table = dp.read(gb.f_pkl_w)
 
 # query
-query_input = '아프리카 도시'
+query_input = '년 월 일'
 
 # top K
-topk = 10
+topk = 5
+
+# tolerant level
+initial_tolerance = 1
 
 # max edit distance
 max_dist = 10000000
@@ -30,6 +33,8 @@ max_dist = 10000000
 #       doc : [#, #, ..., #], (length of len(query extract)
 #       ...
 #   }
+
+
 def get_doc_vector(tokens):
     doc_vectors = dict()
 
@@ -50,6 +55,8 @@ def get_doc_vector(tokens):
             doc_vectors[doc][index] = weight
 
     return doc_vectors
+
+
 """
 # --------------------------------- #
 # ----- Scoring & Top Results ----- #
@@ -107,6 +114,29 @@ def score_and_tops(q_vector, doc_vectors, k, exclude=None):
     return top
 
 
+
+"""
+# ---------------------- #
+# ----- Spellcheck ----- #
+# ---------------------- #
+"""
+#   pq_dist :
+#       list of PriorityQueue()
+#       each of edit distances with each token
+
+
+def get_distance_pq(tokens):
+    pq_dist = []
+    for index, token in enumerate(tokens):
+        pq = PriorityQueue()
+        for term in w_table.keys():
+            dist = hg.edit_dist(token, term)
+            pq.put((dist, index, term))
+        pq_dist.append(pq)
+
+    return pq_dist
+
+
 """
 # ------------------------ #
 # ----- Main Routine ----- #
@@ -115,13 +145,39 @@ def score_and_tops(q_vector, doc_vectors, k, exclude=None):
 
 
 def retrieve_top_k(query, k):
+
     tokens = an.s_extract(query)
-    tokens = list(dict.fromkeys(tokens))
+    tokens = list(dict.fromkeys(tokens)) # drop duplicate tokens
+    tokens_origin = tokens.copy()
+
     n = len(tokens)
     q_vector = [1] * n
-    doc_vectors = dict()
     found = 0
 
+    print('initial tokens:', tokens)
+
+    pq_dist = get_distance_pq(tokens)
+
+    # ------------------------------------------- #
+    # Initial Tolerance for limited edit distance #
+    # ------------------------------------------- #
+    for index, pq in enumerate(pq_dist):
+        dist = pq.queue[0][0]
+        # correct token
+        if dist == 0:
+            pq.get()
+        # tolerance on misspelled token
+        elif dist <= initial_tolerance:
+            term = pq.queue[0][2]
+            tokens[index] = term
+            pq.get()
+        # no chance
+        else:
+            continue
+
+    # ----------------- #
+    # Initial Retrieval #
+    # ----------------- #
     print('attempt 1 tokens:', tokens)
 
     # get vectors
@@ -134,21 +190,11 @@ def retrieve_top_k(query, k):
     if found == k:
         return tops
 
-    # less than K results?
-    # spellcheck by phoneme
-    #   pq_dist :
-    #       list of PriorityQueue()
-    #       each of edit distances with each token
-    pq_dist = []
-    for index, token in enumerate(tokens):
-        pq = PriorityQueue()
-        for term in w_table.keys():
-            if token == term:
-                continue
-            dist = hg.edit_dist(token, term)
-            pq.put((dist, index, term))
-        pq_dist.append(pq)
+    # now the case that results are less than K
 
+    # ------------------ #
+    # Tolerant Retrieval #
+    # ------------------ #
     attempt = 2
     while True:
         # break : all PQueues are empty
@@ -161,11 +207,13 @@ def retrieve_top_k(query, k):
         # get one minimum element
         min_dist = max_dist
         min_index = -1
-        for index, pq in enumerate(pq_dist):
-            dist = pq.queue[0][0]
-            if min_dist > dist:
+        for pq in pq_dist:
+            dist, index, term = pq.queue[0]
+            if (min_dist > dist)\
+                or (min_dist == dist and len(tokens_origin[min_index]) < len(tokens_origin[index])):
                 min_dist = dist
                 min_index = index
+
         dist, index, term = pq_dist[min_index].get()
 
         # retrieve

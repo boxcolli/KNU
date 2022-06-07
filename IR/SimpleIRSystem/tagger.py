@@ -18,7 +18,6 @@ def pos_okt(txt):
 def pos_kkma(txt):
     return kkma.pos(txt, flatten=True, join=False)
 
-
 def extract(txt):
     approved = []
     word_pos = pos_okt(txt)
@@ -38,3 +37,6 @@ def extract(txt):
 
     return approved
 
+# example = '1923년 12월 15일'
+# print(pos_okt(example))
+# print(pos_kkma(example))

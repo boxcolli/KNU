@@ -69,8 +69,30 @@ def _levenshtein_algorithm(A, B):
 
     return helper(m - 1 , n - 1)
 
-def edit_dist(A, B, fix=True):
-    if fix:
-        A = _convert(A)
-        B = _convert(B)
-    return _levenshtein_algorithm(A, B)
+def edit_dist(a, b):
+    if len(a) == len(b):
+        return _levenshtein_algorithm(_convert(a), _convert(b))
+
+    # short, long string
+    sh, lo = a, b
+    if len(a) > len(b):
+        sh, lo = lo, sh
+
+    # distance score on different length
+    dist = diff = len(lo) - len(sh)
+
+    # distance score when same length
+    min_leven = len(lo) * 4  # (just big number)
+    for i in range(diff):
+        sh_con = _convert(sh)
+        lo_con = _convert(lo[i:i+len(sh)])
+        min_leven = min (
+            min_leven,
+            _levenshtein_algorithm(sh_con, lo_con)
+        )
+
+    # add up both score
+    dist += min_leven
+
+    return dist
+
