@@ -13,7 +13,10 @@ import hangeul as hg
 w_table = dp.read(gb.f_pkl_w)
 
 # query
-query_input = '리제 마이트너'
+query_input = '아프리카 도시'
+
+# top K
+topk = 10
 
 # max edit distance
 max_dist = 10000000
@@ -60,7 +63,6 @@ def score_and_tops(q_vector, doc_vectors, k, exclude=None):
     # get scores & sort
     pq = PriorityQueue()
     for doc, vector in doc_vectors.items():
-        print('\tscoring:', doc, vector)
 
         # absolute value of document vector
         # ignore zero vector
@@ -81,6 +83,8 @@ def score_and_tops(q_vector, doc_vectors, k, exclude=None):
 
         # push score
         pq.put((-score, doc))
+
+        print('\tscore:', doc, [float("{:.4f}".format(x)) for x in vector], '=>', float("{:.4}".format(score)))
 
     # get top K results
     top = list()
@@ -179,4 +183,9 @@ def retrieve_top_k(query, k):
     return tops
 
 
-print(retrieve_top_k(query_input, 5))
+retrieved = retrieve_top_k(query_input, topk)
+print()
+print('----- found {}/{} results -----'.format(len(retrieved), topk))
+for rank, tup in enumerate(retrieved):
+    doc, score = tup
+    print('#{}\t{} ... {:.4f}'.format(rank+1, doc, score))
