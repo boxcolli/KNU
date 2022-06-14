@@ -43,6 +43,7 @@ Simple Information Retrieval system in Python
 -  My works/practices
   -  Term index structure
   -  tf-idf weight, scoring with cosine similarity
+  -  Spellcheck with levenshtein edit distance algorithm
 
 ## MPC (2021-2)
 Massively Parallel Computing   
@@ -52,3 +53,33 @@ NVidia CUDA programming practices
   - GPU structure
   - GPGPU mechanisms
 
+## Algorithm2 (2021-2)
+Algorithm practices
+
+- My practices
+  - Quick sort
+  - Kruskal algorithm
+  - Disjoint set forest, weighted union, collapsing find
+  - DFS, BFS, Topological sort
+  - Bellman ford algorithm
+  - Maxflow, edmond-carp algorithm
+  - Heap
+  - Prim algorithm
+  - Dijkstra algorithm
+  - Winner tree
+  - Optimal binary search tree
+  - Parallel sort
+
+## Computer Graphics (2021-1)
+OpenGL practices
+
+- My practices
+  - OpenGL APIs
+  - Tranformation
+  - Hidden surface removal
+  - Camera frame
+  - Orthogonal normalization
+  - Perspective projection
+  - Phong reflection
+  - Ambient reflection
+  - Diffuse reflection
