@@ -1,0 +1,90 @@
+#include <stdio.h>
+
+int main(int argc, char* argv[], char* envp[])
+{
+    printf("argc = %d\n", argc);
+    for (int i = 0; i < argc; ++i)
+        printf("argv[%d] = \"%s\"\n", i, argv[i]);
+    
+    for (int i = 0; envp[i] != nullptr; ++i)
+        printf("envp[%d] = \"%s\"\n", i, envp[i]);
+    
+    return 0;
+}
+
+/* RESULT:
+argc = 1
+argv[0] = "./10-argc"
+envp[0] = "SHELL=/bin/bash"
+envp[1] = "SESSION_MANAGER=local/yoonmin-A320MH:@/tmp/.ICE-unix/1511,unix/yoonmin-A320MH:/tmp/.ICE-unix/1511"
+envp[2] = "QT_ACCESSIBILITY=1"
+envp[3] = "COLORTERM=truecolor"
+envp[4] = "XDG_CONFIG_DIRS=/etc/xdg/xdg-ubuntu:/etc/xdg"
+envp[5] = "XDG_MENU_PREFIX=gnome-"
+envp[6] = "TERM_PROGRAM_VERSION=1.61.0"
+envp[7] = "GNOME_DESKTOP_SESSION_ID=this-is-deprecated"
+envp[8] = "APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL=true"
+envp[9] = "LANGUAGE=en_US:en"
+envp[10] = "LC_ADDRESS=ko_KR.UTF-8"
+envp[11] = "GNOME_SHELL_SESSION_MODE=ubuntu"
+envp[12] = "LC_NAME=ko_KR.UTF-8"
+envp[13] = "SSH_AUTH_SOCK=/run/user/1000/keyring/ssh"
+envp[14] = "BREAKPAD_DUMP_LOCATION=/home/yoonmin/.config/Code/exthost Crash Reports"
+envp[15] = "XMODIFIERS=@im=ibus"
+envp[16] = "DESKTOP_SESSION=ubuntu"
+envp[17] = "LC_MONETARY=ko_KR.UTF-8"
+envp[18] = "SSH_AGENT_PID=1438"
+envp[19] = "BAMF_DESKTOP_FILE_HINT=/var/lib/snapd/desktop/applications/code_code.desktop"
+envp[20] = "GTK_MODULES=gail:atk-bridge"
+envp[21] = "PWD=/home/yoonmin/Documents/college/20212/MPP"
+envp[22] = "GSETTINGS_SCHEMA_DIR=/snap/code/76/usr/share/glib-2.0/schemas"
+envp[23] = "XDG_SESSION_DESKTOP=ubuntu"
+envp[24] = "LOGNAME=yoonmin"
+envp[25] = "XDG_SESSION_TYPE=x11"
+envp[26] = "GPG_AGENT_INFO=/run/user/1000/gnupg/S.gpg-agent:0:1"
+envp[27] = "XAUTHORITY=/run/user/1000/gdm/Xauthority"
+envp[28] = "VSCODE_GIT_ASKPASS_NODE=/snap/code/76/usr/share/code/code"
+envp[29] = "GJS_DEBUG_TOPICS=JS ERROR;JS LOG"
+envp[30] = "WINDOWPATH=2"
+envp[31] = "HOME=/home/yoonmin"
+envp[32] = "USERNAME=yoonmin"
+envp[33] = "IM_CONFIG_PHASE=1"
+envp[34] = "LC_PAPER=ko_KR.UTF-8"
+envp[35] = "LANG=en_US.UTF-8"
+envp[36] = "LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:"
+envp[37] = "XDG_CURRENT_DESKTOP=Unity"
+envp[38] = "DISABLE_WAYLAND=1"
+envp[39] = "GIT_ASKPASS=/snap/code/76/usr/share/code/resources/app/extensions/git/dist/askpass.sh"
+envp[40] = "INVOCATION_ID=236d1fe1213a44a395359ef476501c38"
+envp[41] = "MANAGERPID=1242"
+envp[42] = "CHROME_DESKTOP=code-url-handler.desktop"
+envp[43] = "GJS_DEBUG_OUTPUT=stderr"
+envp[44] = "LESSCLOSE=/usr/bin/lesspipe %s %s"
+envp[45] = "XDG_SESSION_CLASS=user"
+envp[46] = "TERM=xterm-256color"
+envp[47] = "LC_IDENTIFICATION=ko_KR.UTF-8"
+envp[48] = "LESSOPEN=| /usr/bin/lesspipe %s"
+envp[49] = "USER=yoonmin"
+envp[50] = "VSCODE_GIT_IPC_HANDLE=/run/user/1000/vscode-git-09d10515be.sock"
+envp[51] = "DISPLAY=:0"
+envp[52] = "SHLVL=1"
+envp[53] = "LC_TELEPHONE=ko_KR.UTF-8"
+envp[54] = "QT_IM_MODULE=ibus"
+envp[55] = "LC_MEASUREMENT=ko_KR.UTF-8"
+envp[56] = "PAPERSIZE=a4"
+envp[57] = "XDG_RUNTIME_DIR=/run/user/1000"
+envp[58] = "LC_TIME=ko_KR.UTF-8"
+envp[59] = "VSCODE_GIT_ASKPASS_MAIN=/snap/code/76/usr/share/code/resources/app/extensions/git/dist/askpass-main.js"
+envp[60] = "JOURNAL_STREAM=8:62351"
+envp[61] = "XDG_DATA_DIRS=/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop"
+envp[62] = "GDK_BACKEND=x11"
+envp[63] = "PATH=/home/yoonmin/.local/bin:/home/yoonmin/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
+envp[64] = "GDMSESSION=ubuntu"
+envp[65] = "ORIGINAL_XDG_CURRENT_DESKTOP=ubuntu:GNOME"
+envp[66] = "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus"
+envp[67] = "GIO_LAUNCHED_DESKTOP_FILE_PID=13495"
+envp[68] = "GIO_LAUNCHED_DESKTOP_FILE=/var/lib/snapd/desktop/applications/code_code.desktop"
+envp[69] = "LC_NUMERIC=ko_KR.UTF-8"
+envp[70] = "TERM_PROGRAM=vscode"
+envp[71] = "_=./10-argc"
+*/
