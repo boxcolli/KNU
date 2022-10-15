@@ -1,0 +1,20 @@
+4 pages
+Choose any data, related to Data Science topic
+
+Suggestions
+	Regression and Prediction
+	Classification, Clustering
+	Predictive Analytics
+	Recommendation Systems
+	Deep Learning
+
+Topic
+	Sentiment, twitter, summer time, covid...
+
+Paper
+	Title
+	Name
+	Abstract, very short summary what you've done acieved
+	I. Introduction, your work, (twitter, list out what have done past, what motivated you)
+	Equations, algorithms
+	Graphs Experimental results
